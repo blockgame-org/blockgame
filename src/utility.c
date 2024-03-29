@@ -20,8 +20,8 @@ bg_realloc(void *p, size_t size)
 {
   p = realloc(p, size);
 
-	if (!p && size)
-		bg_panic("Reallocation error");
+  if (!p && size)
+    bg_panic("Reallocation error");
 
 	return p;
 }
