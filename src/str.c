@@ -31,3 +31,14 @@ str_after(char c, char *stream)
 {
     return str_skip(c, &stream[str_find_next(c, stream)]);
 }
+
+int
+str_starts_with(char *str, char *substr)
+{
+    while (str[0] && substr[0] && str[0] == substr[0])
+    {
+        str++;
+        substr++;
+    }
+    return !substr[0];
+}

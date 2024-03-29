@@ -15,4 +15,7 @@ str_skip(char c, char *stream);
 char *
 str_after(char c, char *stream);
 
+int
+str_starts_with(char *str, char *substr);
+
 #endif // BG_STR_H
