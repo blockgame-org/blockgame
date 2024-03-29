@@ -1,7 +1,10 @@
 #include <blockgame/vector.h>
+
 #include <blockgame/utility.h>
+
 #include <string.h>
 #include <assert.h>
+#include <stdlib.h>
 
 void
 bg_vector(struct bg_vector *out, size_t element)
