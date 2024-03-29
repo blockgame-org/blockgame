@@ -2,12 +2,14 @@
 #  - GCC_MM_OUTPUT
 
 CC=cc
+CFLAGS=-Wall -Iinclude
+LDFLAGS=-lSDL2 -lepoxy
 BLOCKGAME=blockgame
 
 # Generated with `gcc -MM -Iinclude src/*.c`
 {GCC_MM_OUTPUT}
 
 build: main.o
-	$(CC) -o$(BLOCKGAME) -Iinclude src/*.c
+	$(CC) -o$(BLOCKGAME) $(LDFLAGS) $(CFLAGS) src/*.c
 
 .PHONY: build
