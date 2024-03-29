@@ -23,5 +23,5 @@ bg_realloc(void *p, size_t size)
   if (!p && size)
     bg_panic("Reallocation error");
 
-	return p;
+  return p;
 }
