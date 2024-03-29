@@ -15,10 +15,7 @@ def main():
     with open("makefile", 'w') as f:
         f.write(MAKE_TEMPLATE.format(GCC_MM_OUTPUT=gcc_mm_output))
 
-    if len(sys.argv) == 1:
-        return
-
-    os.system("make " + " ".join(sys.argv[1:]))
+    os.system("make build")
 
 
 if __name__ == "__main__":
