@@ -21,7 +21,7 @@ str_next_line(char *stream)
 char *
 str_skip(char c, char *stream)
 {
-    while (stream[0]==c)
+    while (stream && stream[0]==c)
         stream++;
     return stream;
 }
