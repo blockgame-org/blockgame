@@ -297,6 +297,10 @@ parse_model_line_(struct bg_model *out, char *line, size_t len)
     {
         bg_warn("`l` is unimplemented for .obj files:\n  %.*s", (int) len, line);
     }
+    else if (str_starts_with(line, "s"))
+    {
+        bg_warn("`s` is unimplemented for .obj files:\n  %.*s", (int) len, line);
+    }
     else
     {
         bg_panic("Invalid object file syntax:\n  %.*s", (int) len, line);
