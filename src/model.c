@@ -17,17 +17,19 @@ bg_object_face(struct bg_object_face *out)
 }
 
 void
-bg_object_face_free(struct bg_object_face *out)
+bg_object_face_free(struct bg_object_face *face)
 {
-     bg_vector_free(&out->vertices);
-     bg_vector_free(&out->normals);
-     bg_vector_free(&out->uvs);
+     bg_vector_free(&face->vertices);
+     bg_vector_free(&face->normals);
+     bg_vector_free(&face->uvs);
+
+     memset(face, 0, sizeof(struct bg_object_face));
 }
 
 void
-bg_object_face_cleanup(void *out)
+bg_object_face_cleanup(void *face)
 {
-     bg_object_face_free((struct bg_object_face *)out);
+     bg_object_face_free((struct bg_object_face *)face);
 }
 
 
@@ -123,19 +125,6 @@ bg_model_free(struct bg_model *model)
     memset(model, 0, sizeof(struct bg_model));
 }
 
-/// @brief skips the initial "op" at the begginning of a line
-/// @return a progressed pointer
-char *
-skip_op_(char *line, size_t len)
-{
-    char *initial_line = line;
-
-    line = str_after(' ', line);
-    if (!line[0])
-        bg_panic("An error occured while parsing .obj file: %.*s",
-                 (int) len, initial_line);
-    return line;
-}
 
 
 void
@@ -250,7 +239,7 @@ parse_face_(struct bg_object_face *out, char *line, size_t len)
 }
 
 void
-parse_line_(struct bg_model *out, char *line, size_t len)
+parse_model_line_(struct bg_model *out, char *line, size_t len)
 {
     if (!len)
         return;
@@ -286,6 +275,10 @@ parse_line_(struct bg_model *out, char *line, size_t len)
         struct bg_object *object =  bg_vector_at(struct bg_object, &out->objects, out->objects.length-1);
         bg_vector_append(&object->normals, &vert, 1);
     }
+    else if (str_starts_with(line, "vp"))
+    {
+        bg_warn("`vp` is unimplemented for .obj files:\n  %.*s", (int) len, line);
+    }
     else if (str_starts_with(line, "v"))
     {
         union bg_object_vertex vert;
@@ -299,6 +292,10 @@ parse_line_(struct bg_model *out, char *line, size_t len)
         parse_face_(&face, line, len);
         struct bg_object *object =  bg_vector_at(struct bg_object, &out->objects, out->objects.length-1);
         bg_vector_append(&object->faces, &face, 1);
+    }
+    else if (str_starts_with(line, "l"))
+    {
+        bg_warn("`l` is unimplemented for .obj files:\n  %.*s", (int) len, line);
     }
     else
     {
@@ -314,7 +311,7 @@ bg_parse_model(struct bg_model *out, char *stream)
     while (stream[0])
     {
         int line_len = str_find_next('\n', stream);
-        parse_line_(out, stream, line_len);
+        parse_model_line_(out, stream, line_len);
         stream = str_next_line(stream);
     }
 

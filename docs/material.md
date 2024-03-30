@@ -3,6 +3,11 @@
 Although we support most of the material file spec, our engine cannot render
 all of the information contained in the usual `.mtl` file.
 
+## Transmission Filter Color
+- This only supports the RGB mode.
+- Does not allow use of `.rfl` files
+- Does not allow using CIEXYZ
+
 ## (planned) Supported Illumination Models:
 
 - 0. Color on and Ambient off

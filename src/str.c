@@ -1,4 +1,5 @@
 #include "str.h"
+#include <blockgame/panic.h>
 
 size_t
 str_find_next(char c, char *stream)
@@ -41,4 +42,19 @@ str_starts_with(char *str, char *substr)
         substr++;
     }
     return !substr[0];
+}
+
+
+/// @brief skips the initial "op" at the begginning of a line
+/// @return a progressed pointer
+char *
+skip_op_(char *line, size_t len)
+{
+    char *initial_line = line;
+
+    line = str_after(' ', line);
+    if (!line[0])
+        bg_panic("An error occured while parsing .obj file: %.*s",
+                 (int) len, initial_line);
+    return line;
 }
