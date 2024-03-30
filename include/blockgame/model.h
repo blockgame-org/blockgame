@@ -33,15 +33,15 @@ union bg_object_vertex
 void
 bg_object_vertex(union bg_object_vertex *out, float x, float y, float z);
 
-struct bg_object_uv
+union bg_object_uv
 {
-    float x;
-    float y;
+    struct { float x, y; };
+    float values[2];
 };
 
 
 void
-bg_object_uv(struct bg_object_uv *out, float x, float y);
+bg_object_uv(union bg_object_uv *out, float x, float y);
 
 
 struct bg_object
@@ -53,10 +53,14 @@ struct bg_object
 
     char* object_name;
     char* group_name;
+    char* material_name;
 };
 
 void
 bg_object(struct bg_object *object, char *name, size_t name_len);
+
+void
+bg_object_set_material(struct bg_object *object, char *name, size_t name_len);
 
 void
 bg_object_shrink(struct bg_object *object);
@@ -71,6 +75,8 @@ bg_object_cleanup(void *object);
 struct bg_model
 {
     struct bg_vector objects;
+
+    char* mtllib_name;
     // struct bg_vector textures;
 };
 
@@ -78,9 +84,15 @@ void
 bg_model(struct bg_model *model);
 
 void
+bg_model_set_mtllib(struct bg_model *model, char *name, size_t name_len);
+
+void
 bg_model_free(struct bg_model *model);
 
 void
-bg_load_model(struct bg_model *out, char *stream);
+bg_parse_model(struct bg_model *out, char *stream);
+
+void
+bg_load_model(struct bg_model *out, char *file_name);
 
 #endif // BG_MODEL_H
