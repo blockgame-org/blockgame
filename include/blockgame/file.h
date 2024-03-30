@@ -4,7 +4,7 @@
 /// @brief Reads and allocates the contents of a file into a string.
 /// @param out Output for the newly allocated string with the file's contents.
 /// @param filename Name of the file to be opened.
-/// @return 
+/// @return Returns zero on success, otherwise nonzero on failure.
 int
 bg_read_file(char **out, char const *filename);
 
