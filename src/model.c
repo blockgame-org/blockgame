@@ -243,6 +243,10 @@ parse_face_(struct bg_object_face *out, char *line, size_t len)
             bg_vector_append(&out->normals, &values[2], 1);
         line = str_after(' ', line);
     }
+
+    bg_vector_shrink(&out->vertices);
+    bg_vector_shrink(&out->uvs);
+    bg_vector_shrink(&out->normals);
 }
 
 void
@@ -313,6 +317,17 @@ bg_parse_model(struct bg_model *out, char *stream)
         parse_line_(out, stream, line_len);
         stream = str_next_line(stream);
     }
+
+    for (int i = 0; i < out->objects.length; i++)
+    {
+        struct bg_object *object =  bg_vector_at(struct bg_object, &out->objects, out->objects.length-1);
+        bg_vector_shrink(&object->vertices);
+        bg_vector_shrink(&object->normals);
+        bg_vector_shrink(&object->uvs);
+        bg_vector_shrink(&object->faces);
+    }
+
+    bg_vector_shrink(&out->objects);
 }
 
 void
