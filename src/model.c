@@ -4,6 +4,7 @@
 #include <string.h>
 #include <blockgame/utility.h>
 #include <blockgame/panic.h>
+#include <blockgame/log.h>
 #include "str.h"
 
 void
@@ -112,15 +113,13 @@ parse_object_(struct bg_object *out, char *line, size_t len)
         bg_panic("An error occured while parsing .obj file: %s",
                  initial_line);
 
-    size_t str_size = str_find_next('\n', line);
+    // size_t str_size = str_find_next('\n', line);
     if (len - (line - initial_line) == 0)
         bg_panic("Cannot create object without a name: %s",
                  line);
     bg_object(out, line, len - (line - initial_line));
 }
 
-
-// TODO: MAKE THIS WORK, IT IS UNFINISHED
 void
 parse_vertex_(union bg_object_vertex *out, char *line, size_t len)
 {
@@ -133,7 +132,58 @@ parse_vertex_(union bg_object_vertex *out, char *line, size_t len)
 
     for (int i = 0; i < 3; i++)
     {
+        if (!line[0])
+            bg_panic("Vertex does not contain enough values:\n  %s", initial_line);
         out->values[i] = strtof(line, NULL);
+        line = str_after(' ', line);
+    }
+}
+
+/// @brief parses the digits in a face
+/// @param out a pointer to an int[3] array.
+void
+parse_face_digit_(int *out, char *line)
+{
+    out[0] = -2;
+    out[1] = -2;
+    out[2] = -2;
+
+    for (int i = 0; i < 3; i++)
+    {
+        if (line[0] == '/')
+        {
+            line += 1;
+            continue;
+        }
+        char *end = line;
+        out[i] = strtod(line, &end);
+        if (end[0]!='/')
+            break;
+        line = end + 1;
+    }
+}
+
+void
+parse_face_(struct bg_object_face *out, char *line, size_t len)
+{
+    char *initial_line = line;
+
+    line = str_after(' ', line);
+    if (!line[0])
+        bg_panic("An error occured while parsing .obj file: %s",
+                 initial_line);
+
+    while (line[0])
+    {
+        int values[3];
+        parse_face_digit_((int *) &values, line);
+        if (values[0]==-2)
+            bg_panic("A parsing error has occured:\n  %s", initial_line);
+        bg_vector_append(&out->vertices, &values[0], 1);
+        if (values[1] != -2)
+            bg_vector_append(&out->uvs, &values[1], 1);
+        if (values[2] != -2)
+            bg_vector_append(&out->normals, &values[2], 1);
         line = str_after(' ', line);
     }
 }
@@ -159,6 +209,13 @@ parse_line_(struct bg_model *out, char *line, size_t len)
         parse_vertex_(&vert, line, len);
         struct bg_object *object =  bg_vector_at(struct bg_object, &out->objects, out->objects.length-1);
         bg_vector_append(&object->vertices, &vert, 1);
+    }
+    else if (str_starts_with(line, "f"))
+    {
+        struct bg_object_face face;
+        parse_face_(&face, line, len);
+        struct bg_object *object =  bg_vector_at(struct bg_object, &out->objects, out->objects.length-1);
+        bg_vector_append(&object->faces, &face, 1);
     }
     else
         bg_panic("Invalid object file syntax:\n  %s", line);
