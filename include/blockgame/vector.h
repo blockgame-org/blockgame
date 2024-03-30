@@ -11,7 +11,7 @@ struct bg_vector
     size_t capacity;
 };
 
-
+#define bg_vector_at(type, vec, idx) (&((type *) (vec)->raw)[idx])
 
 void
 bg_vector(struct bg_vector *out, size_t element_size);
