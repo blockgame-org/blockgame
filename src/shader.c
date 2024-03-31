@@ -12,7 +12,7 @@
 
 /// @brief Compiles a shader program.
 /// @return Returns the compiled program ID, otherwise 0 on failure.
-unsigned int compileShader_(GLenum type, char const *filename,
+unsigned int compileShader_(GLenum type, char const *fileName,
                             char const *content, size_t contentLength) {
   unsigned int id = glCreateShader(type);
 
@@ -34,17 +34,17 @@ unsigned int compileShader_(GLenum type, char const *filename,
   glGetShaderInfoLog(id, logLen, NULL, logMsg);
 
   bg_error("Failed to compile shader '%s': %s",
-           filename ? filename : "<unknown>", logMsg);
+           fileName ? fileName : "<unknown>", logMsg);
 
   free(logMsg);
 
   return 0;
 }
 
-int bg_vertex_shader(bgShader *out, char const *filename, char const *content,
+int bg_vertex_shader(bgShader *out, char const *fileName, char const *content,
                      size_t contentLength) {
   unsigned int id =
-      compileShader_(GL_VERTEX_SHADER, filename, content, contentLength);
+      compileShader_(GL_VERTEX_SHADER, fileName, content, contentLength);
 
   if (0 == id)
     return -1;
@@ -52,10 +52,10 @@ int bg_vertex_shader(bgShader *out, char const *filename, char const *content,
   return 0;
 }
 
-int bg_fragment_shader(bgShader *out, char const *filename, char const *content,
+int bg_fragment_shader(bgShader *out, char const *fileName, char const *content,
                        size_t contentLength) {
   unsigned int id =
-      compileShader_(GL_FRAGMENT_SHADER, filename, content, contentLength);
+      compileShader_(GL_FRAGMENT_SHADER, fileName, content, contentLength);
 
   if (0 == id)
     return -1;
