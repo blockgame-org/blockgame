@@ -53,8 +53,18 @@ static inline void bgVec3f_cross(bgVec3f out, bgVec3f v, bgVec3f n) {
   out[2] = z;
 }
 
+static inline void bgVec3f_scale(bgVec3f out, bgVec3f v, float s) {
+  out[0] = v[0] * s;
+  out[1] = v[1] * s;
+  out[2] = v[2] * s;
+}
+
+static inline float bgVec3f_dot(bgVec3f v1, bgVec3f v2) {
+  return v2[0] * v1[0] + v2[1] * v1[1] + v2[2] * v1[2];
+}
+
 static inline float bgVec4f_dot(bgVec4f v1, bgVec4f v2) {
-  return v1[0] * v2[0] + v1[1] * v2[1] + v1[2] * v2[2] + v1[3] * v2[3];
+  return v2[0] * v1[0] + v2[1] * v1[1] + v2[2] * v1[2] + v2[3] * v1[3];
 }
 
 static inline void bgVec4f_scale(bgVec4f out, bgVec4f v, float s) {
@@ -121,8 +131,7 @@ static inline void bgMat4_transpose(bgMat4 out, bgMat4 m) {
       out[i][j] = m[j][i];
 }
 
-static inline void bgMat4_translate(bgMat4 out, bgVec3f v)
-{
+static inline void bgMat4_translate(bgMat4 out, bgVec3f v) {
   bgMat4_identity(out);
 
   out[3][0] = v[0];
@@ -164,14 +173,18 @@ static inline void bgMat4_scale(bgMat4 out, bgMat4 m, float s) {
   bgVec4f_scale(out[0], m[0], s);
   bgVec4f_scale(out[1], m[1], s);
   bgVec4f_scale(out[2], m[2], s);
-  bgVec4f_scale(out[3], m[3], s);
+
+  out[3][0] = m[3][0];
+  out[3][1] = m[3][1];
+  out[3][2] = m[3][2];
+  out[3][3] = m[3][3];
 }
 
 static inline void bgMat4_lookAt(bgMat4 out, bgVec3f eye, bgVec3f center,
                                  bgVec3f up) {
   bgVec3f f = {0., 0., 0.};
   bgVec3f s = {0., 0., 0.};
-  bgVec3f t = {0., 0., 0.};
+  bgVec3f u = {0., 0., 0.};
 
   bgVec3f_sub(f, center, eye);
   bgVec3f_normalize(f, f);
@@ -179,18 +192,35 @@ static inline void bgMat4_lookAt(bgMat4 out, bgVec3f eye, bgVec3f center,
   bgVec3f_cross(s, f, up);
   bgVec3f_normalize(s, s);
 
-  bgVec3f_cross(t, s, f);
+  bgVec3f_cross(u, s, f);
+
+  /*
+    bgMat4_identity(out);
+
+    out[0][0] = s[0];
+    out[1][0] = s[1];
+    out[2][0] = s[2];
+    out[0][1] = u[0];
+    out[1][1] = u[1];
+    out[2][1] = u[2];
+    out[0][2] = -f[0];
+    out[1][2] = -f[1];
+    out[2][2] = -f[2];
+    out[0][3] = -bgVec3f_dot(s, eye);
+    out[1][3] = -bgVec3f_dot(u, eye);
+    out[2][3] = bgVec3f_dot(f, eye);
+  */
 
   out[0][0] = s[0];
-  out[0][1] = t[0];
+  out[0][1] = u[0];
   out[0][2] = -f[0];
   out[0][3] = 0.;
   out[1][0] = s[1];
-  out[1][1] = t[1];
+  out[1][1] = u[1];
   out[1][2] = -f[1];
   out[1][3] = 0.;
   out[2][0] = s[2];
-  out[2][1] = t[2];
+  out[2][1] = u[2];
   out[2][2] = -f[2];
   out[2][3] = 0.;
   out[3][0] = 0.;
@@ -205,10 +235,12 @@ static inline void bgMat4_lookAt(bgMat4 out, bgVec3f eye, bgVec3f center,
 }
 
 static inline void bgQuat_angleAxis(bgQuat out, float angle, bgVec3f n) {
-  out[0] = n[0] * sin(angle / 2);
-  out[1] = n[1] * sin(angle / 2);
-  out[2] = n[2] * sin(angle / 2);
-  out[3] = cos(angle / 2);
+  float s = sinf(angle * .5);
+
+  out[0] = n[0] * s;
+  out[1] = n[1] * s;
+  out[2] = n[2] * s;
+  out[3] = cosf(angle * .5);
 }
 
 static inline float bgQuat_dot(bgQuat q1, bgQuat q2) {
@@ -248,6 +280,7 @@ static inline void bgQuat_conjugate(bgQuat out, bgQuat q) {
 static inline void bgQuat_rotate(bgVec3f out, bgQuat q, bgVec3f v) {
   // https://blog.molecular-matters.com/2013/05/24/a-faster-quaternion-vector-multiplication/
 
+  /*
   bgVec3f t = {q[0], q[1], q[2]};
 
   bgVec3f uv = {0., 0., 0.};
@@ -259,22 +292,18 @@ static inline void bgQuat_rotate(bgVec3f out, bgQuat q, bgVec3f v) {
   out[0] = v[0] + ((uv[0] * q[3]) + uuv[0]) * 2.;
   out[1] = v[1] + ((uv[1] * q[3]) + uuv[1]) * 2.;
   out[2] = v[2] + ((uv[2] * q[3]) + uuv[2]) * 2.;
-
-  /*
-    bgVec3f t1 = {0.,0.,0.};
-    bgVec3f_cross(t1, q, v);
-
-    t1[0] = 2 * t1[0];
-    t1[1] = 2 * t1[1];
-    t1[2] = 2 * t1[2];
-
-    bgVec3f t2 = {0., 0., 0.};
-    bgVec3f_cross(t2, q, t1);
-
-    out[0] = v[0] + q[3] * t1[0] + t2[0];
-    out[1] = v[1] + q[3] * t1[1] + t2[1];
-    out[2] = v[2] + q[3] * t1[2] + t2[2];
   */
+
+  bgVec3f t1 = {0., 0., 0.};
+  bgVec3f_cross(t1, q, v);
+  bgVec3f_scale(t1, t1, 2.);
+
+  bgVec3f t2 = {0., 0., 0.};
+  bgVec3f_cross(t2, q, t1);
+
+  out[0] = v[0] + q[3] * t1[0] + t2[0];
+  out[1] = v[1] + q[3] * t1[1] + t2[1];
+  out[2] = v[2] + q[3] * t1[2] + t2[2];
 }
 
 #endif // BLOCKGAME_MATH_H
