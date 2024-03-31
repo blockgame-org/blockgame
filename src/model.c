@@ -26,7 +26,7 @@ void bgObjectFace_cleanup(void *face) {
   bgObjectFace_free((bgObjectFace *)face);
 }
 
-void bgObject_vertex(bgObjectVertex *out, float x, float y, float z) {
+void bg_objectVertex(bgObjectVertex *out, float x, float y, float z) {
   out->x = x;
   out->y = y;
   out->z = z;
