@@ -17,7 +17,7 @@ int bg_fragment_shader(bgShader *out, char const *fileName, char const *content,
 
 int bgShader_free(bgShader *shader);
 
-typedef struct {
+typedef struct  {
   unsigned int index;
   char const *name;
 } bgVertexAttribute;
@@ -26,14 +26,14 @@ typedef struct {
   unsigned int id;
 } bgProgram;
 
-int bgProgram(bgProgram *out, bgShader *shaders, size_t shadersLength,
+int bg_program(bgProgram *out, bgShader *shaders, size_t shadersLength,
               bgVertexAttribute *attributes, size_t attributesLength);
 
 int bgProgram_use(bgProgram *prog);
 
 int bgProgram_getUniformId(bgProgram *prog, char const *uniformName);
 
-int bgProgram_setIniformMat4(bgProgram *prog, int location, bgMat4 m);
+int bgProgram_setUniformMat4(bgProgram *prog, int location, bgMat4 m);
 
 void bgProgram_free(bgProgram *prog);
 

@@ -26,7 +26,7 @@ void bgVector_dropEndCleanup(bgVector *vec, size_t count,
   for (size_t i = vec->length - count; i < vec->length; i++)
     cleanup((char *)vec->raw + (i * vec->element));
 
-  bgVector_drop_end(vec, count);
+  bgVector_dropEnd(vec, count);
 }
 
 void bgVector_grow(bgVector *vec, size_t count) {

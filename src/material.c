@@ -33,8 +33,8 @@ void bg_modelMaterial(bgModelMaterial *out, char *name,
   out->displacement_texture = NULL;
   out->decal_texture = NULL;
 
-  bg_object_vertex(&out->texture_origin, 0, 0, 0);
-  bg_object_vertex(&out->texture_scale, 1, 1, 1);
+  bg_objectVertex(&out->texture_origin, 0, 0, 0);
+  bg_objectVertex(&out->texture_scale, 1, 1, 1);
 
   out->name = bg_calloc(name_len + 1, sizeof(char));
   strncpy(out->name, name, name_len);
@@ -169,102 +169,102 @@ void parse_material_line_(bgMtllib *out, char *line, size_t len) {
   if (!len)
     return;
 
-  if (str_starts_with(line, "#"))
+  if (str_startsWith(line, "#"))
     return;
-  else if (str_starts_with(line, "newmtl")) {
+  else if (str_startsWith(line, "newmtl")) {
     bgModelMaterial mat;
     parse_newmtl_(&mat, line, len);
     bgVector_append(&out->materials, &mat, 1);
-  } else if (str_starts_with(line, "Ka")) {
+  } else if (str_startsWith(line, "Ka")) {
     bgColorf color;
     parse_color_(&color, line, len);
     bgModelMaterial *mat = bgVector_at(
         bgModelMaterial, &out->materials, out->materials.length - 1);
     mat->ambient = color;
-  } else if (str_starts_with(line, "Kd")) {
+  } else if (str_startsWith(line, "Kd")) {
     bgColorf color;
     parse_color_(&color, line, len);
     bgModelMaterial *mat = bgVector_at(bgModelMaterial, &out->materials, out->materials.length - 1);
     mat->diffuse = color;
-  } else if (str_starts_with(line, "Ks")) {
+  } else if (str_startsWith(line, "Ks")) {
     bgColorf color;
     parse_color_(&color, line, len);
     bgModelMaterial *mat = bgVector_at(bgModelMaterial, &out->materials, out->materials.length - 1);
     mat->specular_color = color;
-  } else if (str_starts_with(line, "Ns")) {
+  } else if (str_startsWith(line, "Ns")) {
     float weight;
     parse_float_(&weight, line, len);
     bgModelMaterial *mat = bgVector_at(bgModelMaterial, &out->materials, out->materials.length - 1);
     mat->specular_weight = weight;
-  } else if (str_starts_with(line, "d")) {
+  } else if (str_startsWith(line, "d")) {
     float d;
     parse_float_(&d, line, len);
     bgModelMaterial *mat = bgVector_at(bgModelMaterial, &out->materials, out->materials.length - 1);
     mat->dissolve = d;
-  } else if (str_starts_with(line, "Tr")) {
+  } else if (str_startsWith(line, "Tr")) {
     float d;
     parse_float_(&d, line, len);
     bgModelMaterial *mat = bgVector_at(bgModelMaterial, &out->materials, out->materials.length - 1);
     mat->dissolve = 1.0f - d;
-  } else if (str_starts_with(line, "Tf")) {
+  } else if (str_startsWith(line, "Tf")) {
     bgColorf color;
     parse_color_(&color, line, len);
     bgModelMaterial *mat = bgVector_at(bgModelMaterial, &out->materials, out->materials.length - 1);
     mat->filter_color = color;
-  } else if (str_starts_with(line, "Ni")) {
+  } else if (str_startsWith(line, "Ni")) {
     float d;
     parse_float_(&d, line, len);
     bgModelMaterial *mat = bgVector_at(bgModelMaterial, &out->materials, out->materials.length - 1);
     mat->refraction_index = d;
-  } else if (str_starts_with(line, "illum")) {
+  } else if (str_startsWith(line, "illum")) {
     int d;
     parse_int_(&d, line, len);
     bgModelMaterial *mat = bgVector_at(bgModelMaterial, &out->materials, out->materials.length - 1);
     mat->illumination_model = d;
-  } else if (str_starts_with(line, "map_Ka")) {
+  } else if (str_startsWith(line, "map_Ka")) {
     char *filename;
     size_t name_len;
     parse_filename_(&filename, &name_len, line, len);
     bgModelMaterial *mat = bgVector_at(bgModelMaterial, &out->materials, out->materials.length - 1);
     bgModelMaterial_setAmbientTexture(mat, filename, name_len);
-  } else if (str_starts_with(line, "map_Ks")) {
+  } else if (str_startsWith(line, "map_Ks")) {
     char *filename;
     size_t name_len;
     parse_filename_(&filename, &name_len, line, len);
     bgModelMaterial *mat = bgVector_at(bgModelMaterial, &out->materials, out->materials.length - 1);
     bgModelMaterial_setSpecularTexture(mat, filename, name_len);
-  } else if (str_starts_with(line, "map_Kd")) {
+  } else if (str_startsWith(line, "map_Kd")) {
     char *filename;
     size_t name_len;
     parse_filename_(&filename, &name_len, line, len);
     bgModelMaterial *mat = bgVector_at(bgModelMaterial, &out->materials, out->materials.length - 1);
     bgModelMaterial_setDiffuseTexture(mat, filename, name_len);
-  } else if (str_starts_with(line, "map_Ns")) {
+  } else if (str_startsWith(line, "map_Ns")) {
     char *filename;
     size_t name_len;
     parse_filename_(&filename, &name_len, line, len);
     bgModelMaterial *mat = bgVector_at(bgModelMaterial, &out->materials, out->materials.length - 1);
     bgModelMaterial_setHighlightTexture(mat, filename, name_len);
-  } else if (str_starts_with(line, "map_d")) {
+  } else if (str_startsWith(line, "map_d")) {
     char *filename;
     size_t name_len;
     parse_filename_(&filename, &name_len, line, len);
     bgModelMaterial *mat = bgVector_at(bgModelMaterial, &out->materials, out->materials.length - 1);
     bgModelMaterial_setAlphaTexture(mat, filename, name_len);
-  } else if (str_starts_with(line, "map_bump") ||
-             str_starts_with(line, "bump")) {
+  } else if (str_startsWith(line, "map_bump") ||
+             str_startsWith(line, "bump")) {
     char *filename;
     size_t name_len;
     parse_filename_(&filename, &name_len, line, len);
     bgModelMaterial *mat = bgVector_at(bgModelMaterial, &out->materials, out->materials.length - 1);
     bgModelMaterial_setBumpTexture(mat, filename, name_len);
-  } else if (str_starts_with(line, "disp")) {
+  } else if (str_startsWith(line, "disp")) {
     char *filename;
     size_t name_len;
     parse_filename_(&filename, &name_len, line, len);
     bgModelMaterial *mat = bgVector_at(bgModelMaterial, &out->materials, out->materials.length - 1);
     bgModelMaterial_setDisplacementTexture(mat, filename, name_len);
-  } else if (str_starts_with(line, "decal")) {
+  } else if (str_startsWith(line, "decal")) {
     char *filename;
     size_t name_len;
     parse_filename_(&filename, &name_len, line, len);

@@ -121,6 +121,15 @@ static inline void bgMat4_transpose(bgMat4 out, bgMat4 m) {
       out[i][j] = m[j][i];
 }
 
+static inline void bgMat4_translate(bgMat4 out, bgVec3f v)
+{
+  bgMat4_identity(out);
+
+  out[3][0] = v[0];
+  out[3][1] = v[1];
+  out[3][2] = v[2];
+}
+
 static inline void bgMat4_translateInPlace(bgMat4 inout, bgVec3f v) {
   bgVec4f t = {v[0], v[1], v[2], 0.};
   bgVec4f r = {0., 0., 0., 0.};

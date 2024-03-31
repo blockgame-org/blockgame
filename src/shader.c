@@ -85,21 +85,21 @@ int bg_program(bgProgram *out, bgShader *shaders, size_t shaders_length,
   return 0;
 }
 
-int bg_program_use(bgProgram *prog) {
+int bgProgram_use(bgProgram *prog) {
   glUseProgram(prog->id);
   return 0;
 }
 
-int bg_program_get_uniform_id(bgProgram *prog, char const *uniform_name) {
+int bgProgram_getUniformId(bgProgram *prog, char const *uniform_name) {
   return glGetUniformLocation(prog->id, uniform_name);
 }
 
-int bg_program_set_uniform_mat4(bgProgram *prog, int location, bg_mat4 mat) {
+int bgProgram_setUniformMat4(bgProgram *prog, int location, bgMat4 mat) {
   glUniformMatrix4fv(location, 1, GL_FALSE, (float *)mat);
   return 0;
 }
 
-void bg_program_free(bgProgram *prog) {
+void bgProgram_free(bgProgram *prog) {
   glDeleteProgram(prog->id);
   memset(prog, 0, sizeof(bgProgram));
 }

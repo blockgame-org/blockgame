@@ -134,7 +134,7 @@ void parse_mtllib_(bgModel *out, char *line, size_t len) {
   if (len - (line - initial_line) == 0)
     bg_panic("Cannot use material library without a name: %.*s", (int)len,
              line);
-  bg_model_setMtllib(out, line, len - (line - initial_line));
+  bgModel_setMtllib(out, line, len - (line - initial_line));
 }
 
 void parse_vertex_(bgObjectVertex *out, char *line, size_t len) {
@@ -205,51 +205,51 @@ void parse_model_line_(bgModel *out, char *line, size_t len) {
   if (!len)
     return;
 
-  if (str_starts_with(line, "#"))
+  if (str_startsWith(line, "#"))
     return;
-  else if (str_starts_with(line, "mtllib")) {
+  else if (str_startsWith(line, "mtllib")) {
     parse_mtllib_(out, line, len);
-  } else if (str_starts_with(line, "usemtl")) {
+  } else if (str_startsWith(line, "usemtl")) {
     bgObject *object =
         bgVector_at(bgObject, &out->objects, out->objects.length - 1);
     parse_usemtl_(object, line, len);
-  } else if (str_starts_with(line, "g")) {
+  } else if (str_startsWith(line, "g")) {
     bgObject *object =
         bgVector_at(bgObject, &out->objects, out->objects.length - 1);
     parse_group_(object, line, len);
-  } else if (str_starts_with(line, "o")) {
+  } else if (str_startsWith(line, "o")) {
     bgObject obj;
     parse_object_(&obj, line, len);
     bgVector_append(&out->objects, &obj, 1);
-  } else if (str_starts_with(line, "vt")) {
+  } else if (str_startsWith(line, "vt")) {
     bgObjectUV uv;
     parse_uv_(&uv, line, len);
     bgObject *object =
         bgVector_at(bgObject, &out->objects, out->objects.length - 1);
     bgVector_append(&object->uvs, &uv, 1);
-  } else if (str_starts_with(line, "vn")) {
+  } else if (str_startsWith(line, "vn")) {
     bgObjectVertex vert;
     parse_vertex_(&vert, line, len);
     bgObject *object =
         bgVector_at(bgObject, &out->objects, out->objects.length - 1);
     bgVector_append(&object->normals, &vert, 1);
-  } else if (str_starts_with(line, "vp")) {
+  } else if (str_startsWith(line, "vp")) {
     bg_warn("`vp` is unimplemented for .obj files:\n  %.*s", (int)len, line);
-  } else if (str_starts_with(line, "v")) {
+  } else if (str_startsWith(line, "v")) {
     bgObjectVertex vert;
     parse_vertex_(&vert, line, len);
     bgObject *object =
         bgVector_at(bgObject, &out->objects, out->objects.length - 1);
     bgVector_append(&object->vertices, &vert, 1);
-  } else if (str_starts_with(line, "f")) {
+  } else if (str_startsWith(line, "f")) {
     bgObjectFace face;
     parse_face_(&face, line, len);
     bgObject *object =
         bgVector_at(bgObject, &out->objects, out->objects.length - 1);
     bgVector_append(&object->faces, &face, 1);
-  } else if (str_starts_with(line, "l")) {
+  } else if (str_startsWith(line, "l")) {
     bg_warn("`l` is unimplemented for .obj files:\n  %.*s", (int)len, line);
-  } else if (str_starts_with(line, "s")) {
+  } else if (str_startsWith(line, "s")) {
     bg_warn("`s` is unimplemented for .obj files:\n  %.*s", (int)len, line);
   } else {
     bg_panic("Invalid object file syntax:\n  %.*s", (int)len, line);
@@ -279,6 +279,6 @@ void bgModel_parse(bgModel *out, char *stream) {
 
 void bgModel_load(bgModel *out, char *file_name) {
   char *file_data = NULL;
-  bg_read_file(&file_data, file_name);
+  bg_readFile(&file_data, file_name);
   bgModel_parse(out, file_data);
 }

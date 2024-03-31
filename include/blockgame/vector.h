@@ -19,8 +19,6 @@ void bgVector_dropEnd(bgVector *vec, size_t count);
 void bgVector_dropEndCleanup(bgVector *vec, size_t count,
                              void (*cleanup)(void *));
 
-void bgVector(bgVector *out, size_t element_size);
-
 void bgVector_grow(bgVector *vec, size_t count);
 
 void bgVector_shrink(bgVector *vec);
