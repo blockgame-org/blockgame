@@ -7,74 +7,74 @@
 // SHOULD BE CREATE A "SHRINK" / "FIT EXACT" function to vectors to remove
 // excess space.
 
-struct bg_object_face {
-  struct bg_vector vertices; // indices as a uint32_t
-  struct bg_vector normals;  // indices as a uint32_t
-  struct bg_vector uvs;      // indices as a uint32_t
-};
+typedef struct {
+  bgVector vertices; // indices as a uint32_t
+  bgVector normals;  // indices as a uint32_t
+  bgVector uvs;      // indices as a uint32_t
+} bgObjectFace;
 
-void bg_object_face(struct bg_object_face *out);
+void bg_objectFace(bgObjectFace *out);
 
-void bg_object_face_free(struct bg_object_face *out);
+void bgObjectFace_free(bgObjectFace *out);
 
-void bg_object_face_cleanup(void *out);
+void bgObjectFace_cleanup(void *out);
 
-union bg_object_vertex {
+typedef union {
   struct {
     float x, y, z;
   };
   float values[3];
-};
+} bgObjectVertex;
 
-void bg_object_vertex(union bg_object_vertex *out, float x, float y, float z);
+void bg_objectVertex(bgObjectVertex *out, float x, float y, float z);
 
-union bg_object_uv {
+typedef union {
   struct {
     float x, y;
   };
   float values[2];
-};
+} bgObjectUV;
 
-void bg_object_uv(union bg_object_uv *out, float x, float y);
+void bg_objectUV(bgObjectUV *out, float x, float y);
 
-struct bg_object {
-  struct bg_vector vertices; // bg_object_vertex vector
-  struct bg_vector normals;  // bg_object_vertex vector
-  struct bg_vector uvs;      // bg_object_uv vector
-  struct bg_vector faces;    // bg_object_face vector
+typedef struct {
+  bgVector vertices; // bg_object_vertex vector
+  bgVector normals;  // bg_object_vertex vector
+  bgVector uvs;      // bg_object_uv vector
+  bgVector faces;    // bg_object_face vector
 
   char *object_name;
   char *group_name;
   char *material_name;
-};
+} bgObject;
 
-void bg_object(struct bg_object *object, char *name, size_t name_len);
+void bg_object(bgObject *object, char *name, size_t name_len);
 
-void bg_object_set_material(struct bg_object *object, char *name,
+void bgObject_setMaterial(bgObject *object, char *name,
                             size_t name_len);
 
-void bg_object_set_group(struct bg_object *object, char *name, size_t name_len);
+void bgObject_setGroup(bgObject *object, char *name, size_t name_len);
 
-void bg_object_shrink(struct bg_object *object);
+void bgObject_shrink(bgObject *object);
 
-void bg_object_free(struct bg_object *object);
+void bgObject_free(bgObject *object);
 
-void bg_object_cleanup(void *object);
+void bgObject_cleanup(void *object);
 
-struct bg_model {
-  struct bg_vector objects;
+typedef struct {
+  bgVector objects;
 
   char *mtllib_name;
-};
+} bgModel;
 
-void bg_model(struct bg_model *model);
+void bg_model(bgModel *model);
 
-void bg_model_set_mtllib(struct bg_model *model, char *name, size_t name_len);
+void bgModel_setMtllib(bgModel *model, char *name, size_t name_len);
 
-void bg_model_free(struct bg_model *model);
+void bgModel_free(bgModel *model);
 
-void bg_parse_model(struct bg_model *out, char *stream);
+void bgModel_parse(bgModel *out, char *stream);
 
-void bg_load_model(struct bg_model *out, char *file_name);
+void bgModel_load(bgModel *out, char *file_name);
 
 #endif // BG_MODEL_H

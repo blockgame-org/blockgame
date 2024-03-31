@@ -4,10 +4,10 @@
 #include <blockgame/mathtypes.h>
 #include <blockgame/vector.h>
 
-enum bg_animation_interp_mode { LINEAR = 0, BEZIER = 1, CATMULLROM = 2 };
+enum bgAnimationInterpMode { LINEAR = 0, BEZIER = 1, CATMULLROM = 2 };
 
 // silly bitflags used here. Honestly pretty epic
-enum bg_animation_channel {
+enum bgAnimationChannel {
   NONE = 0,
 
   RX = 1,
@@ -28,43 +28,44 @@ enum bg_animation_channel {
   ALL = R | T | S
 };
 
-struct bg_animation_bezier {
-  enum bg_animation_channel channel;
+typedef struct {
+  enum bgAnimationChannel channel;
   float left_value, left_time;
   float right_value, right_time;
-};
+} bgAnimationBezier;
 
-struct bg_animation_keyframe {
+typedef struct {
   float timestamp;
 
-  bg_vec3f rotation;
-  bg_vec3f translation;
-  bg_vec3f scale;
+  bgVec3f rotation;
+  bgVec3f translation;
+  bgVec3f scale;
 
-  bg_vec3f pivot;
-  enum bg_animation_interp_mode interp_mode[9]; // indices for each channel
+  bgVec3f pivot;
+  enum bgAnimationInterpMode interp_mode[9]; // indices for each channel
   size_t interp_bezier_ind[9];                  // indices for each channel
-};
+} bgAnimationKeyframe;
 
-void bg_animation_keyframe(struct bg_animation_keyframe *out, float timestamp);
+void
+bgAnimation_keyframe(bgAnimationKeyframe *out, float timestamp);
 
-void bg_animation_keyframe_apply_imode(struct bg_animation_keyframe *out,
-                                       float timestamp);
+void
+bgAnimationKeyframe_applyImode(bgAnimationKeyframe *out);
 
-void bg_animation_keyframe_get_bezier(
-    struct bg_animation_bezier *out, struct bg_animation_object const *obj,
-    struct bg_animation_keyframe const *keyframe, enum bg_animation_channel);
+void bgAnimationKeyframe_getBezier(
+    bgAnimationBezier *out, bgAnimationObject const *obj,
+    bgAnimationKeyframe const *keyframe, enum bgAnimationChannel);
 
-struct bg_animation_object {
-  struct bg_vector keyframes;
-  struct bg_vector keyframe_beziers;
+typedef struct {
+  bgVector keyframes;
+  bgVector keyframe_beziers;
   char *name;
-};
+} bgAnimationObject;
 
-enum bg_animation_repeat_mode { ONCE = 0, REPEAT = 1, HOLD = 2 };
+enum bgAnimationRepeatMode { ONCE = 0, REPEAT = 1, HOLD = 2 };
 
-struct bg_animation {
-  enum bg_animation_repeat_mode repeat_mode;
+typedef struct bgAnimation {
+  enum bgAnimationRepeatMode repeat_mode;
   float duration;
 };
 
