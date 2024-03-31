@@ -30,7 +30,7 @@ bg_init_logger(FILE *handle)
 
 void
 bg_log_(
-  int severity,
+  enum bg_log_severity severity,
   char const *filename,
   int fileline,
   char const *format,
@@ -46,13 +46,16 @@ bg_log_(
   char const *severity_str = NULL; 
   switch (severity)
   {
-  case BG_INFO:
+  case BG_LOG_DEBUG:
+    severity_str = "DEBUG";
+    break;
+  case BG_LOG_INFO:
     severity_str = "INFO";
     break;
-  case BG_WARN:
+  case BG_LOG_WARN:
     severity_str = "WARN";
     break;
-  case BG_ERROR: 
+  case BG_LOG_ERROR: 
     severity_str = "ERROR";
     break;
   }
