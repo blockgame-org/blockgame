@@ -5,39 +5,36 @@
 
 #include <stddef.h>
 
-struct bg_shader {
+typedef struct {
   unsigned int id;
-};
+} bgShader;
 
-int bg_vertex_shader(struct bg_shader *out, char const *filename,
-                     char const *content, size_t content_length);
+int bg_vertex_shader(bgShader *out, char const *filename, char const *content,
+                     size_t contentLength);
 
-int bg_fragment_shader(struct bg_shader *out, char const *filename,
-                       char const *content, size_t content_length);
+int bg_fragment_shader(bgShader *out, char const *filename, char const *content,
+                       size_t contentLength);
 
-int bg_shader_free(struct bg_shader *shader);
+int bgShader_free(bgShader *shader);
 
-struct bg_vertex_attribute {
+typedef struct {
   unsigned int index;
   char const *name;
-};
+} bgVertexAttribute;
 
-struct bg_program {
+typedef struct {
   unsigned int id;
-};
+} bgProgram;
 
-int bg_program(struct bg_program *out, struct bg_shader *shaders,
-               size_t shaders_length, struct bg_vertex_attribute *attributes,
-               size_t attributes_length);
+int bgProgram(bgProgram *out, bgShader *shaders, size_t shadersLength,
+              bgVertexAttribute *attributes, size_t attributesLength);
 
-int bg_program_use(struct bg_program *prog);
+int bgProgram_use(bgProgram *prog);
 
-int bg_program_get_uniform_id(struct bg_program *prog,
-                              char const *uniform_name);
+int bgProgram_getUniformId(bgProgram *prog, char const *uniformName);
 
-int bg_program_set_uniform_mat4(struct bg_program *prog, int location,
-                                bg_mat4 mat);
+int bgProgram_setIniformMat4(bgProgram *prog, int location, bgMat4 m);
 
-void bg_program_free(struct bg_program *prog);
+void bgProgram_free(bgProgram *prog);
 
 #endif // BLOCKGAME_SHADER_H

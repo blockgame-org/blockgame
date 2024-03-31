@@ -5,7 +5,7 @@
 
 #include <stdio.h>
 
-int bg_read_file(char **out, char const *filename) {
+int bg_readFile(char **out, char const *filename) {
   FILE *fd = fopen(filename, "r");
 
   if (!fd || 0 != fseek(fd, 0, SEEK_END))

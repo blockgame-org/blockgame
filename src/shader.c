@@ -12,11 +12,11 @@
 
 /// @brief Compiles a shader program.
 /// @return Returns the compiled program ID, otherwise 0 on failure.
-unsigned int compile_shader_(GLenum type, char const *filename,
-                             char const *content, size_t content_length) {
+unsigned int compileShader_(GLenum type, char const *filename,
+                            char const *content, size_t contentLength) {
   unsigned int id = glCreateShader(type);
 
-  glShaderSource(id, 1, &content, &(int){content_length});
+  glShaderSource(id, 1, &content, &(int){contentLength});
   glCompileShader(id);
 
   int status = 0;
@@ -27,24 +27,24 @@ unsigned int compile_shader_(GLenum type, char const *filename,
 
   // Compilation wasn't successful
 
-  int log_length = 0;
-  glGetShaderiv(id, GL_INFO_LOG_LENGTH, &log_length);
+  int logLen = 0;
+  glGetShaderiv(id, GL_INFO_LOG_LENGTH, &logLen);
 
-  char *log_message = bg_calloc(log_length + 1, sizeof(char));
-  glGetShaderInfoLog(id, log_length, NULL, log_message);
+  char *logMsg = bg_calloc(logLen + 1, sizeof(char));
+  glGetShaderInfoLog(id, logLen, NULL, logMsg);
 
   bg_error("Failed to compile shader '%s': %s",
-           filename ? filename : "<unknown>", log_message);
+           filename ? filename : "<unknown>", logMsg);
 
-  free(log_message);
+  free(logMsg);
 
   return 0;
 }
 
-int bg_vertex_shader(struct bg_shader *out, char const *filename,
-                     char const *content, size_t content_length) {
+int bg_vertex_shader(bgShader *out, char const *filename, char const *content,
+                     size_t contentLength) {
   unsigned int id =
-      compile_shader_(GL_VERTEX_SHADER, filename, content, content_length);
+      compileShader_(GL_VERTEX_SHADER, filename, content, contentLength);
 
   if (0 == id)
     return -1;
@@ -52,10 +52,10 @@ int bg_vertex_shader(struct bg_shader *out, char const *filename,
   return 0;
 }
 
-int bg_fragment_shader(struct bg_shader *out, char const *filename,
-                       char const *content, size_t content_length) {
+int bg_fragment_shader(bgShader *out, char const *filename, char const *content,
+                       size_t contentLength) {
   unsigned int id =
-      compile_shader_(GL_FRAGMENT_SHADER, filename, content, content_length);
+      compileShader_(GL_FRAGMENT_SHADER, filename, content, contentLength);
 
   if (0 == id)
     return -1;
@@ -63,21 +63,20 @@ int bg_fragment_shader(struct bg_shader *out, char const *filename,
   return 0;
 }
 
-int bg_shader_free(struct bg_shader *shader) {
+int bgShader_free(bgShader *shader) {
   glDeleteShader(shader->id);
-  memset(shader, 0, sizeof(struct bg_shader));
+  memset(shader, 0, sizeof(bgShader));
   return 0;
 }
 
-int bg_program(struct bg_program *out, struct bg_shader *shaders,
-               size_t shaders_length, struct bg_vertex_attribute *attributes,
-               size_t attributes_length) {
+int bg_program(bgProgram *out, bgShader *shaders, size_t shaders_length,
+               bgVertexAttribute *attributes, size_t attributesLength) {
   unsigned int id = glCreateProgram();
 
   for (size_t i = 0; i < shaders_length; ++i)
     glAttachShader(id, shaders[i].id);
 
-  for (size_t i = 0; i < attributes_length; ++i)
+  for (size_t i = 0; i < attributesLength; ++i)
     glBindAttribLocation(id, attributes[i].index, attributes[i].name);
 
   glLinkProgram(id);
@@ -86,23 +85,21 @@ int bg_program(struct bg_program *out, struct bg_shader *shaders,
   return 0;
 }
 
-int bg_program_use(struct bg_program *prog) {
+int bg_program_use(bgProgram *prog) {
   glUseProgram(prog->id);
   return 0;
 }
 
-int bg_program_get_uniform_id(struct bg_program *prog,
-                              char const *uniform_name) {
+int bg_program_get_uniform_id(bgProgram *prog, char const *uniform_name) {
   return glGetUniformLocation(prog->id, uniform_name);
 }
 
-int bg_program_set_uniform_mat4(struct bg_program *prog, int location,
-                                bg_mat4 mat) {
+int bg_program_set_uniform_mat4(bgProgram *prog, int location, bg_mat4 mat) {
   glUniformMatrix4fv(location, 1, GL_FALSE, (float *)mat);
   return 0;
 }
 
-void bg_program_free(struct bg_program *prog) {
+void bg_program_free(bgProgram *prog) {
   glDeleteProgram(prog->id);
-  memset(prog, 0, sizeof(struct bg_program));
+  memset(prog, 0, sizeof(bgProgram));
 }
