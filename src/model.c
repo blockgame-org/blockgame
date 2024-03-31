@@ -74,6 +74,13 @@ bg_object_set_material(struct bg_object *object, char *name, size_t name_len)
 }
 
 void
+bg_object_set_group(struct bg_object *object, char *name, size_t name_len)
+{
+    object->group_name = bg_calloc(name_len+1, sizeof(char));
+    strncpy(object->group_name, name, name_len);
+}
+
+void
 bg_object_shrink(struct bg_object *object)
 {
     bg_vector_shrink(&object->vertices);
@@ -149,6 +156,18 @@ parse_usemtl_(struct bg_object *out, char *line, size_t len)
         bg_panic("Cannot use material without a name: %.*s",
                 (int) len, line);
     bg_object_set_material(out, line, len - (line - initial_line));
+}
+
+void
+parse_group_(struct bg_object *out, char *line, size_t len)
+{
+    char *initial_line = line;
+    line = skip_op_(line, len);
+
+    if (len - (line - initial_line) == 0)
+        bg_panic("Cannot set gruop without a name: %.*s",
+                (int) len, line);
+    bg_object_set_group(out, line, len - (line - initial_line));
 }
 
 void
@@ -254,6 +273,11 @@ parse_model_line_(struct bg_model *out, char *line, size_t len)
     {
         struct bg_object *object =  bg_vector_at(struct bg_object, &out->objects, out->objects.length-1);
         parse_usemtl_(object, line, len);
+    }
+    else if (str_starts_with(line, "g"))
+    {
+        struct bg_object *object =  bg_vector_at(struct bg_object, &out->objects, out->objects.length-1);
+        parse_group_(object, line, len);
     }
     else if (str_starts_with(line, "o"))
     {

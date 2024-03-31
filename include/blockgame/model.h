@@ -63,6 +63,9 @@ void
 bg_object_set_material(struct bg_object *object, char *name, size_t name_len);
 
 void
+bg_object_set_group(struct bg_object *object, char *name, size_t name_len);
+
+void
 bg_object_shrink(struct bg_object *object);
 
 void
