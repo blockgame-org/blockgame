@@ -16,6 +16,8 @@ void bg_camera(bgCamera *out) {
   out->pitch = 0.;
   out->heading = 0.;
 
+  out->speed = 0.1;
+
   out->up[0] = 0.;
   out->up[1] = 1.;
   out->up[2] = 0.;
@@ -37,8 +39,46 @@ void bg_camera(bgCamera *out) {
   bgMat4_identity(out->projection);
 }
 
+void bgCamera_move(bgCamera *cam, enum bgCameraMoveDirection dir) {
+  bgVec3f t = {0., 0., 0.};
+
+  // TODO: Add camera speed
+  switch (dir) {
+  case BG_CAMERA_MOVE_UP:
+    bgVec3f_scale(t, cam->up, cam->speed);
+    bgVec3f_add(cam->position, cam->position, t);
+    break;
+  case BG_CAMERA_MOVE_DOWN:
+    bgVec3f_scale(t, cam->up, cam->speed);
+    bgVec3f_sub(cam->position, cam->position, t);
+    break;
+  case BG_CAMERA_MOVE_LEFT:
+    bgVec3f_cross(t, cam->direction, cam->up);
+    bgVec3f_normalize(t, t);
+    bgVec3f_scale(t, t, cam->speed);
+    bgVec3f_add(cam->position, cam->position, t);
+    break;
+  case BG_CAMERA_MOVE_RIGHT:
+    bgVec3f_cross(t, cam->direction, cam->up);
+    bgVec3f_normalize(t, t);
+    bgVec3f_scale(t, t, cam->speed);
+    bgVec3f_sub(cam->position, cam->position, t);
+    break;
+  case BG_CAMERA_MOVE_FORWARD:
+    bgVec3f_add(t, t, cam->direction);
+    bgVec3f_scale(t, t, cam->speed);
+    bgVec3f_add(cam->position, cam->position, t);
+    break;
+  case BG_CAMERA_MOVE_BACKWARD:
+    bgVec3f_add(t, t, cam->direction);
+    bgVec3f_scale(t, t, cam->speed);
+    bgVec3f_sub(cam->position, cam->position, t);
+    break;
+  }
+}
+
 void bgCamera_step(bgCamera *cam, float dt) {
-  bgVec3f_sub(cam->direction, cam->lookAt, cam->direction);
+  bgVec3f_sub(cam->direction, cam->lookAt, cam->position);
   bgVec3f_normalize(cam->direction, cam->direction);
 
   // TODO: Set viewport?
@@ -64,9 +104,9 @@ void bgCamera_step(bgCamera *cam, float dt) {
   bgVec3f_add(cam->lookAt, cam->position, cam->direction);
 
   bgMat4_lookAt(cam->view, cam->position, cam->lookAt, cam->up);
-  
-  //bgMat4_identity(cam->model);
-  // NOTE: This is temporary
-  bgMat4_translate(cam->model, (bgVec3f){.5 * 10, 1. * 10, .5 * 10});
-  bgMat4_scale(cam->model, cam->model, 5.);
+
+  // bgMat4_identity(cam->model);
+  //  NOTE: This is temporary
+  bgMat4_translate(cam->model, (bgVec3f){0., 5., 5.});
+  bgMat4_scale(cam->model, cam->model, 1.);
 }
