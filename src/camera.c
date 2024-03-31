@@ -5,24 +5,6 @@
 
 #include <string.h>
 
-void debug_vec3f(bgVec3f v) {
-  bg_debug("x: %f, y: %f, z: %f", v[0], v[1], v[2]);
-}
-
-void debug_vec4f(bgVec4f v) {
-  bg_debug("x: %f, y: %f, z: %f, w: %f", v[0], v[1], v[2], v[3]);
-}
-
-void debug_mat4(bgMat4 m) {
-  bg_debug("\n\tm[0][0]: %f, m[0][1]: %f, m[0][2]: %f, m[0][3]: %f\n"
-           "\tm[1][0]: %f, m[1][1]: %f, m[1][2]: %f, m[1][3]: %f\n"
-           "\tm[2][0]: %f, m[2][1]: %f, m[2][2]: %f, m[2][3]: %f\n"
-           "\tm[3][0]: %f, m[3][1]: %f, m[3][2]: %f, m[3][3]: %f\n",
-           m[0][0], m[0][1], m[0][2], m[0][3], m[1][0], m[1][1], m[1][2],
-           m[1][3], m[2][0], m[2][1], m[2][2], m[2][3], m[3][0], m[3][1],
-           m[3][2], m[3][3]);
-}
-
 void bg_camera(bgCamera *out) {
   memset(out, 0, sizeof(bgCamera));
 
@@ -69,7 +51,6 @@ void bgCamera_step(bgCamera *cam, float dt) {
 
   bgQuat pitch = {0., 0., 0., 0.};
   bgQuat_angleAxis(pitch, cam->pitch, axis);
-  debug_vec4f(pitch);
 
   bgQuat heading = {0., 0., 0., 0.};
   bgQuat_angleAxis(heading, cam->heading, cam->up);
@@ -88,8 +69,4 @@ void bgCamera_step(bgCamera *cam, float dt) {
   // NOTE: This is temporary
   bgMat4_translate(cam->model, (bgVec3f){.5 * 10, 1. * 10, .5 * 10});
   bgMat4_scale(cam->model, cam->model, 5.);
-
-  debug_mat4(cam->model);
-  debug_mat4(cam->view);
-  debug_mat4(cam->projection);
 }
