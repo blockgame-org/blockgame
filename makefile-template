@@ -3,13 +3,18 @@
 
 CC=cc
 CFLAGS=-Wall -Iinclude
-LDFLAGS=-lSDL2 -lepoxy
+LDFLAGS=-lSDL2 -lepoxy -lm
 BLOCKGAME=blockgame
+
+CLANG_FORMAT=clang-format
 
 # Generated with `gcc -MM -Iinclude src/*.c`
 {GCC_MM_OUTPUT}
 
 build: main.o
-	$(CC) -o$(BLOCKGAME) $(LDFLAGS) $(CFLAGS) src/*.c
+	$(CC) -g -o$(BLOCKGAME) $(LDFLAGS) $(CFLAGS) src/*.c
+
+format:
+	$(CLANG_FORMAT) -i -style=file src/*.c src/*.h include/blockgame/*.h
 
 .PHONY: build

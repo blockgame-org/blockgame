@@ -4,5 +4,4 @@
 #define BG_DO_STRINGIFY(x) #x
 #define BG_STRINGIFY(x) BG_DO_STRINGIFY(x)
 
-
 #endif // BLOCKGAME_MACRO_H

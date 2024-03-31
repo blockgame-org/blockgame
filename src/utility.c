@@ -4,9 +4,7 @@
 
 #include <string.h>
 
-void *
-bg_calloc(size_t count, size_t size)
-{
+void *bg_calloc(size_t count, size_t size) {
   void *p = calloc(count, size);
 
   if (!p && size)
@@ -15,9 +13,7 @@ bg_calloc(size_t count, size_t size)
   return p;
 }
 
-void *
-bg_realloc(void *p, size_t size)
-{
+void *bg_realloc(void *p, size_t size) {
   p = realloc(p, size);
 
   if (!p && size)

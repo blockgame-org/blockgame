@@ -2,24 +2,20 @@
 
 #include <blockgame/panic.h>
 
-#include <time.h>
-#include <stdlib.h>
 #include <stdarg.h>
+#include <stdlib.h>
 #include <threads.h>
+#include <time.h>
 
 static mtx_t log_mtx;
 static FILE *log_handle = NULL;
 
-void
-destroy_logger(void)
-{
+void destroy_logger(void) {
   log_handle = NULL;
   mtx_destroy(&log_mtx);
 }
 
-void
-bg_init_logger(FILE *handle)
-{
+void bg_init_logger(FILE *handle) {
   if (mtx_init(&log_mtx, mtx_plain) != thrd_success)
     bg_panic("Failed to initialize mutex");
 
@@ -28,24 +24,16 @@ bg_init_logger(FILE *handle)
   atexit(destroy_logger);
 }
 
-void
-bg_log_(
-  enum bg_log_severity severity,
-  char const *filename,
-  int fileline,
-  char const *format,
-  ...
-)
-{
+void bg_log_(enum bg_log_severity severity, char const *filename, int fileline,
+             char const *format, ...) {
   if (!log_handle)
     bg_panic("Logger not initialized");
 
   if (mtx_lock(&log_mtx) != thrd_success)
     bg_panic("Failed to lock mutex");
 
-  char const *severity_str = NULL; 
-  switch (severity)
-  {
+  char const *severity_str = NULL;
+  switch (severity) {
   case BG_LOG_DEBUG:
     severity_str = "DEBUG";
     break;
@@ -55,7 +43,7 @@ bg_log_(
   case BG_LOG_WARN:
     severity_str = "WARN";
     break;
-  case BG_LOG_ERROR: 
+  case BG_LOG_ERROR:
     severity_str = "ERROR";
     break;
   }
@@ -63,16 +51,8 @@ bg_log_(
   time_t t = time(NULL);
   struct tm *local = localtime(&t);
 
-  fprintf(
-    log_handle, 
-    "%s [%d:%d:%d] (%s:%d) ", 
-    severity_str, 
-    local->tm_hour,
-    local->tm_min,
-    local->tm_sec,
-    filename,
-    fileline
-  );
+  fprintf(log_handle, "%s [%d:%d:%d] (%s:%d) ", severity_str, local->tm_hour,
+          local->tm_min, local->tm_sec, filename, fileline);
 
   va_list list;
   va_start(list, format);
