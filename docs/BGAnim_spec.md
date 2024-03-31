@@ -8,8 +8,11 @@ specification for .obj and .mtl
 ```
 # This is a comment!
 
-# specifies the existence of an animation variable
-var <varname>
+# ! UNIMPLEMENTED YET
+# # specifies the existence of an animation variable
+# var <varname>
+
+# * IMPLEMENTED
 
 # set animation duration
 duration <seconds
