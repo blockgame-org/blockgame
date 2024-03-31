@@ -46,11 +46,11 @@ void bgCamera_move(bgCamera *cam, enum bgCameraMoveDirection dir) {
   switch (dir) {
   case BG_CAMERA_MOVE_UP:
     bgVec3f_scale(t, cam->up, cam->speed);
-    bgVec3f_add(cam->position, cam->position, t);
+    bgVec3f_sub(cam->position, cam->position, t);
     break;
   case BG_CAMERA_MOVE_DOWN:
     bgVec3f_scale(t, cam->up, cam->speed);
-    bgVec3f_sub(cam->position, cam->position, t);
+    bgVec3f_add(cam->position, cam->position, t);
     break;
   case BG_CAMERA_MOVE_LEFT:
     bgVec3f_cross(t, cam->direction, cam->up);
