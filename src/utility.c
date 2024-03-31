@@ -5,19 +5,19 @@
 #include <string.h>
 
 void *bg_calloc(size_t count, size_t size) {
-  void *p = calloc(count, size);
+    void *p = calloc(count, size);
 
-  if (!p && size)
-    bg_panic("Allocation error");
+    if (!p && size)
+        bg_panic("Allocation error");
 
-  return p;
+    return p;
 }
 
 void *bg_realloc(void *p, size_t size) {
-  p = realloc(p, size);
+    p = realloc(p, size);
 
-  if (!p && size)
-    bg_panic("Reallocation error");
+    if (!p && size)
+        bg_panic("Reallocation error");
 
-  return p;
+    return p;
 }

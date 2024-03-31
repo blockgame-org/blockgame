@@ -6,31 +6,31 @@
 #include <stdio.h>
 
 int bg_readFile(char **out, char const *filename) {
-  FILE *fd = fopen(filename, "r");
+    FILE *fd = fopen(filename, "r");
 
-  if (!fd || 0 != fseek(fd, 0, SEEK_END))
-    goto READ_ERROR;
+    if (!fd || 0 != fseek(fd, 0, SEEK_END))
+        goto READ_ERROR;
 
-  long length = ftell(fd);
+    long length = ftell(fd);
 
-  if (-1 == length)
-    goto READ_ERROR;
+    if (-1 == length)
+        goto READ_ERROR;
 
-  if (0 != fseek(fd, 0, SEEK_SET))
-    goto READ_ERROR;
+    if (0 != fseek(fd, 0, SEEK_SET))
+        goto READ_ERROR;
 
-  char *content = bg_calloc(length + 1, sizeof(char));
-  size_t read = fread(content, sizeof(char), length, fd);
+    char *content = bg_calloc(length + 1, sizeof(char));
+    size_t read = fread(content, sizeof(char), length, fd);
 
-  if (0 != ferror(fd) || read != length)
-    goto READ_ERROR;
+    if (0 != ferror(fd) || read != length)
+        goto READ_ERROR;
 
-  fclose(fd);
-  *out = content;
-  return 0;
+    fclose(fd);
+    *out = content;
+    return 0;
 
 READ_ERROR:
-  // TODO: Get more error information
-  bg_error("Failed to read file '%s'", filename);
-  return -1;
+    // TODO: Get more error information
+    bg_error("Failed to read file '%s'", filename);
+    return -1;
 }

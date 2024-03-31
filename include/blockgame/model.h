@@ -8,9 +8,9 @@
 // excess space.
 
 typedef struct {
-  bgVector vertices; // indices as a uint32_t
-  bgVector normals;  // indices as a uint32_t
-  bgVector uvs;      // indices as a uint32_t
+    bgVector vertices; // indices as a uint32_t
+    bgVector normals;  // indices as a uint32_t
+    bgVector uvs;      // indices as a uint32_t
 } bgObjectFace;
 
 void bg_objectFace(bgObjectFace *out);
@@ -20,38 +20,37 @@ void bgObjectFace_free(bgObjectFace *out);
 void bgObjectFace_cleanup(void *out);
 
 typedef union {
-  struct {
-    float x, y, z;
-  };
-  float values[3];
+    struct {
+        float x, y, z;
+    };
+    float values[3];
 } bgObjectVertex;
 
 void bg_objectVertex(bgObjectVertex *out, float x, float y, float z);
 
 typedef union {
-  struct {
-    float x, y;
-  };
-  float values[2];
+    struct {
+        float x, y;
+    };
+    float values[2];
 } bgObjectUV;
 
 void bg_objectUV(bgObjectUV *out, float x, float y);
 
 typedef struct {
-  bgVector vertices; // bg_object_vertex vector
-  bgVector normals;  // bg_object_vertex vector
-  bgVector uvs;      // bg_object_uv vector
-  bgVector faces;    // bg_object_face vector
+    bgVector vertices; // bg_object_vertex vector
+    bgVector normals;  // bg_object_vertex vector
+    bgVector uvs;      // bg_object_uv vector
+    bgVector faces;    // bg_object_face vector
 
-  char *object_name;
-  char *group_name;
-  char *material_name;
+    char *object_name;
+    char *group_name;
+    char *material_name;
 } bgObject;
 
 void bg_object(bgObject *object, char *name, size_t name_len);
 
-void bgObject_setMaterial(bgObject *object, char *name,
-                            size_t name_len);
+void bgObject_setMaterial(bgObject *object, char *name, size_t name_len);
 
 void bgObject_setGroup(bgObject *object, char *name, size_t name_len);
 
@@ -62,9 +61,9 @@ void bgObject_free(bgObject *object);
 void bgObject_cleanup(void *object);
 
 typedef struct {
-  bgVector objects;
+    bgVector objects;
 
-  char *mtllib_name;
+    char *mtllib_name;
 } bgModel;
 
 void bg_model(bgModel *model);

@@ -7,14 +7,14 @@
 #include <string.h>
 
 void bg_vector(bgVector *out, size_t element) {
-  out->raw = NULL;
-  out->element = element;
-  out->length = 0;
-  out->capacity = 0;
+    out->raw = NULL;
+    out->element = element;
+    out->length = 0;
+    out->capacity = 0;
 }
 
 void bgVector_dropEnd(bgVector *vec, size_t count) {
-  vec->length -= (count < vec->length) ? count : vec->length;
+    vec->length -= (count < vec->length) ? count : vec->length;
 }
 
 /// @brief calls cleanup function for all dropped elements
@@ -23,56 +23,56 @@ void bgVector_dropEnd(bgVector *vec, size_t count) {
 /// @param cleanup
 void bgVector_dropEndCleanup(bgVector *vec, size_t count,
                              void (*cleanup)(void *)) {
-  for (size_t i = vec->length - count; i < vec->length; i++)
-    cleanup((char *)vec->raw + (i * vec->element));
+    for (size_t i = vec->length - count; i < vec->length; i++)
+        cleanup((char *)vec->raw + (i * vec->element));
 
-  bgVector_dropEnd(vec, count);
+    bgVector_dropEnd(vec, count);
 }
 
 void bgVector_grow(bgVector *vec, size_t count) {
-  assert(vec);
+    assert(vec);
 
-  if (vec->capacity >= count + vec->length)
-    return;
+    if (vec->capacity >= count + vec->length)
+        return;
 
-  if (!vec->capacity && count)
-    vec->capacity = 1;
+    if (!vec->capacity && count)
+        vec->capacity = 1;
 
-  while (vec->capacity < count + vec->length)
-    vec->capacity *= 2;
+    while (vec->capacity < count + vec->length)
+        vec->capacity *= 2;
 
-  if (vec->raw == NULL)
-    vec->raw = bg_calloc(vec->capacity, vec->element);
-  else
-    vec->raw = bg_realloc(vec->raw, (vec->capacity * 2 + 1) * vec->element);
+    if (vec->raw == NULL)
+        vec->raw = bg_calloc(vec->capacity, vec->element);
+    else
+        vec->raw = bg_realloc(vec->raw, (vec->capacity * 2 + 1) * vec->element);
 }
 
 void bgVector_shrink(bgVector *vec) {
-  if (!vec->length)
-    return;
-  vec->raw = bg_realloc(vec->raw, (vec->length) * vec->element);
-  vec->capacity = vec->length;
+    if (!vec->length)
+        return;
+    vec->raw = bg_realloc(vec->raw, (vec->length) * vec->element);
+    vec->capacity = vec->length;
 }
 
 void bgVector_append(bgVector *vec, void *elements, size_t count) {
-  bgVector_grow(vec, count);
-  memcpy((char *)vec->raw + (vec->length * vec->element), elements,
-         count * vec->element);
-  vec->length += count;
+    bgVector_grow(vec, count);
+    memcpy((char *)vec->raw + (vec->length * vec->element), elements,
+           count * vec->element);
+    vec->length += count;
 }
 
 void bgVector_push(bgVector *vec, void *element) {
-  bgVector_append(vec, element, 1);
+    bgVector_append(vec, element, 1);
 }
 
 void bgVector_free(bgVector *vec) {
-  free(vec->raw);
-  memset(vec, 0, sizeof(bgVector));
+    free(vec->raw);
+    memset(vec, 0, sizeof(bgVector));
 }
 
 void bgVector_cleanup(bgVector *vec, void (*cleanup)(void *)) {
-  for (size_t i = 0; i < vec->length; i++)
-    cleanup((char *)vec->raw + (i * vec->element));
+    for (size_t i = 0; i < vec->length; i++)
+        cleanup((char *)vec->raw + (i * vec->element));
 
-  bgVector_free(vec);
+    bgVector_free(vec);
 }

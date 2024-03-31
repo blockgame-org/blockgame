@@ -8,9 +8,9 @@
 #define BG_VERTEX_UV_LOCATION 2
 
 typedef struct {
-  bgVec3f position;
-  bgVec3f normal;
-  bgVec2f uv;
+    bgVec3f position;
+    bgVec3f normal;
+    bgVec2f uv;
 } bgVertex;
 
 int bgVertex_configureVaoVbo(int vao, int vbo, int bindingIx);

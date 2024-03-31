@@ -6,7 +6,7 @@
 #include <stddef.h>
 
 typedef struct {
-  unsigned int id;
+    unsigned int id;
 } bgShader;
 
 int bg_vertex_shader(bgShader *out, char const *fileName, char const *content,
@@ -17,17 +17,17 @@ int bg_fragment_shader(bgShader *out, char const *fileName, char const *content,
 
 int bgShader_free(bgShader *shader);
 
-typedef struct  {
-  unsigned int index;
-  char const *name;
+typedef struct {
+    unsigned int index;
+    char const *name;
 } bgVertexAttribute;
 
 typedef struct {
-  unsigned int id;
+    unsigned int id;
 } bgProgram;
 
 int bg_program(bgProgram *out, bgShader *shaders, size_t shadersLength,
-              bgVertexAttribute *attributes, size_t attributesLength);
+               bgVertexAttribute *attributes, size_t attributesLength);
 
 int bgProgram_use(bgProgram *prog);
 

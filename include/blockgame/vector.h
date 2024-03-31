@@ -4,10 +4,10 @@
 #include <stddef.h>
 
 typedef struct {
-  void *raw;
-  size_t element;
-  size_t length;
-  size_t capacity;
+    void *raw;
+    size_t element;
+    size_t length;
+    size_t capacity;
 } bgVector;
 
 #define bgVector_at(type, vec, idx) (&((type *)(vec)->raw)[idx])
