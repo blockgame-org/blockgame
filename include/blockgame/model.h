@@ -19,6 +19,8 @@ void bgObjectFace_free(bgObjectFace *out);
 
 void bgObjectFace_cleanup(void *out);
 
+void bgObjectFace_copy(void *out, void *src);
+
 typedef union {
     struct {
         float x, y, z;
@@ -60,6 +62,8 @@ void bgObject_free(bgObject *object);
 
 void bgObject_cleanup(void *object);
 
+void bgObject_copy(void *out, void *src);
+
 typedef struct {
     bgVector objects;
 
@@ -75,5 +79,7 @@ void bgModel_free(bgModel *model);
 void bgModel_parse(bgModel *out, char *stream);
 
 void bgModel_load(bgModel *out, char *file_name);
+
+void bgModel_copy(void *out, void *src);
 
 #endif // BG_MODEL_H

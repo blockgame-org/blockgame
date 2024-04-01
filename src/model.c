@@ -26,6 +26,14 @@ void bgObjectFace_cleanup(void *face) {
     bgObjectFace_free((bgObjectFace *)face);
 }
 
+void bgObjectFace_copy(void *out, void *src) {
+    bgObjectFace *out_face = (bgObjectFace *)out;
+    bgObjectFace *src_face = (bgObjectFace *)src;
+    bgVector_duplicate(&out_face->vertices, &src_face->vertices);
+    bgVector_duplicate(&out_face->normals, &src_face->normals);
+    bgVector_duplicate(&out_face->uvs, &src_face->uvs);
+}
+
 void bg_objectVertex(bgObjectVertex *out, float x, float y, float z) {
     out->x = x;
     out->y = y;
@@ -81,6 +89,27 @@ void bgObject_free(bgObject *object) {
 
 void bgObject_cleanup(void *object) { bgObject_free(object); }
 
+void bgObject_copy(void *out, void *src) {
+    bgObject *out_obj = (bgObject *)out;
+    bgObject *src_obj = (bgObject *)src;
+
+    bgVector_duplicate(&out_obj->vertices, &src_obj->vertices);
+    bgVector_duplicate(&out_obj->normals, &src_obj->normals);
+    bgVector_duplicate(&out_obj->uvs, &src_obj->uvs);
+
+    bgVector_copy(&out_obj->faces, &src_obj->faces, bgObjectFace_copy);
+    out_obj->object_name =
+        bg_calloc(strlen(src_obj->object_name) + 1, sizeof(char));
+    out_obj->group_name =
+        bg_calloc(strlen(src_obj->group_name) + 1, sizeof(char));
+    out_obj->material_name =
+        bg_calloc(strlen(src_obj->material_name) + 1, sizeof(char));
+
+    strcpy(out_obj->object_name, src_obj->object_name);
+    strcpy(out_obj->group_name, src_obj->object_name);
+    strcpy(out_obj->material_name, src_obj->object_name);
+}
+
 void bg_model(bgModel *model) {
     bg_vector(&model->objects, sizeof(bgObject));
     model->mtllib_name = NULL;
@@ -95,6 +124,16 @@ void bg_model_free(bgModel *model) {
     free(model->mtllib_name);
     bgVector_cleanup(&model->objects, bgObject_cleanup);
     memset(model, 0, sizeof(bgModel));
+}
+
+void bgModel_copy(void *out, void *src) {
+    bgModel *out_mod = (bgModel *)out;
+    bgModel *src_mod = (bgModel *)src;
+
+    bgVector_copy(&out_mod->objects, &src_mod->objects, bgObject_copy);
+    out_mod->mtllib_name =
+        bg_calloc(strlen(src_mod->mtllib_name) + 1, sizeof(char));
+    strcpy(out_mod->mtllib_name, src_mod->mtllib_name);
 }
 
 void parse_object_(bgObject *out, char *line, size_t len) {
