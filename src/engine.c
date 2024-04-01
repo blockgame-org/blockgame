@@ -4,6 +4,7 @@
 
 #include <blockgame/camera.h>
 #include <blockgame/file.h>
+#include <blockgame/math.h>
 #include <blockgame/mouse.h>
 #include <blockgame/shader.h>
 #include <blockgame/utility.h>
@@ -134,17 +135,7 @@ int bgEngine_run(void) {
     //
 
     bgCamera camera;
-    bg_camera(&camera);
-    camera.position[2] = -1;
-    camera.lookAt[0] = 0.;
-    camera.lookAt[1] = 1.;
-    camera.lookAt[2] = 0.;
-    camera.near = .01;
-    camera.far = 1000.;
-    // TODO: make the camera set up the aspect and viewport for me
-    camera.aspect = 1080. / 720.;
-    camera.viewport[2] = 1080;
-    camera.viewport[3] = 720;
+    bg_camera(&camera, 1080. / 720.);
 
     glViewport(0, 0, 1080, 720);
     glEnable(GL_CULL_FACE);
@@ -189,16 +180,16 @@ int bgEngine_run(void) {
                     BG_ENGINE->running = false;
                     break;
                 case SDLK_a:
-                    bgCamera_move(&camera, BG_CAMERA_MOVE_LEFT);
+                    bgCamera_move(&camera, BG_CAMERA_LEFT);
                     break;
                 case SDLK_d:
-                    bgCamera_move(&camera, BG_CAMERA_MOVE_RIGHT);
+                    bgCamera_move(&camera, BG_CAMERA_RIGHT);
                     break;
                 case SDLK_w:
-                    bgCamera_move(&camera, BG_CAMERA_MOVE_FORWARD);
+                    bgCamera_move(&camera, BG_CAMERA_FORWARD);
                     break;
                 case SDLK_s:
-                    bgCamera_move(&camera, BG_CAMERA_MOVE_BACKWARD);
+                    bgCamera_move(&camera, BG_CAMERA_BACKWARD);
                     break;
                 }
                 break;
@@ -212,11 +203,21 @@ int bgEngine_run(void) {
         //
 
         bgCamera_mouse(&camera);
-        bgCamera_step(&camera, dt);
+        // bgCamera_step(&camera, dt);
 
-        bgProgram_setUniformMat4(&prog, m, camera.model);
-        bgProgram_setUniformMat4(&prog, v, camera.view);
-        bgProgram_setUniformMat4(&prog, p, camera.projection);
+        bgMat4 model;
+        bgMat4 view;
+        bgMat4 projection;
+
+        bgMat4_translate(model, (bgVec3f){0., 0., -2.});
+        bgMat4_scale(model, model, 1.);
+
+        bgCamera_view(&camera, view);
+        bgCamera_projection(&camera, projection);
+
+        bgProgram_setUniformMat4(&prog, m, model);
+        bgProgram_setUniformMat4(&prog, v, view);
+        bgProgram_setUniformMat4(&prog, p, projection);
 
         //
         // Render scene

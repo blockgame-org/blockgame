@@ -1,51 +1,45 @@
+// NOTE: It's probably a better idea to
+// compute the orientation matrix in an
+// update method and save it for re-use.
+
 #ifndef BLOCKGAME_CAMERA_H
 #define BLOCKGAME_CAMERA_H
 
 #include <blockgame/mathtypes.h>
 
-enum bgCameraMoveDirection {
-    BG_CAMERA_MOVE_UP,
-    BG_CAMERA_MOVE_DOWN,
-    BG_CAMERA_MOVE_LEFT,
-    BG_CAMERA_MOVE_RIGHT,
-    BG_CAMERA_MOVE_FORWARD,
-    BG_CAMERA_MOVE_BACKWARD
+// Maximum vertical degrees to avoid gimbal lock
+#define CAMERA_MAX_VERTICAL_DEGREES 85.
+
+enum bgCameraDirection {
+    BG_CAMERA_LEFT,
+    BG_CAMERA_RIGHT,
+    BG_CAMERA_UP,
+    BG_CAMERA_DOWN,
+    BG_CAMERA_FORWARD,
+    BG_CAMERA_BACKWARD
 };
 
 typedef struct {
-    bgVec4u viewport;
-
+    float fovDegrees;
     float aspect;
-    float fov;
     float near;
     float far;
 
-    float pitch;
-    float heading;
+    float vertical;
+    float horizontal;
+
     float speed;
 
-    bgVec2i oldRelativeMousePosition;
-
-    bgVec3f up;
-
     bgVec3f position;
-    bgVec3f lookAt;
-    bgVec3f direction;
-
-    bgMat4 model;
-    bgMat4 view;
-    bgMat4 projection;
 } bgCamera;
 
-void bg_camera(bgCamera *out);
+void bg_camera(bgCamera *camera, float aspect);
+void bgCamera_lookAt(bgCamera *camera, bgVec3f v);
+void bgCamera_move(bgCamera *camera, enum bgCameraDirection direction);
+void bgCamera_mouse(bgCamera *camera);
 
-void bgCamera_offsetHeading(bgCamera *cam, float angle);
-void bgCamera_offsetPitch(bgCamera *cam, float angle);
-
-void bgCamera_mouse(bgCamera *cam);
-
-void bgCamera_move(bgCamera *cam, enum bgCameraMoveDirection dir);
-
-void bgCamera_step(bgCamera *cam, float dt);
+void bgCamera_view(bgCamera const *camera, bgMat4 out);
+void bgCamera_projection(bgCamera const *camera, bgMat4 out);
+void bgCamera_orientation(bgCamera const *camera, bgMat4 out);
 
 #endif // BLOCKGAME_CAMERA_H

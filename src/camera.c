@@ -1,135 +1,97 @@
 #include <blockgame/camera.h>
 
-#include <blockgame/log.h>
 #include <blockgame/math.h>
 #include <blockgame/mouse.h>
 
 #include <string.h>
 
-void bg_camera(bgCamera *out) {
-    memset(out, 0, sizeof(bgCamera));
+static void normalizeAngles_(bgCamera *camera) {
+    camera->horizontal = fmodf(camera->horizontal, 360.);
 
-    out->aspect = 0.;
-    out->fov = bg_degToRad(90);
-    out->near = .1;
-    out->far = 1000.;
+    if (camera->horizontal < 0.)
+        camera->horizontal += 360.;
 
-    out->pitch = 0.;
-    out->heading = 0.;
-
-    out->speed = 0.1;
-
-    out->up[0] = 0.;
-    out->up[1] = 1.;
-    out->up[2] = 0.;
-
-    out->position[0] = 0.;
-    out->position[1] = 0.;
-    out->position[2] = 0.;
-
-    out->lookAt[0] = 0.;
-    out->lookAt[1] = 0.;
-    out->lookAt[2] = 0.;
-
-    out->direction[1] = 0.;
-    out->direction[2] = 0.;
-    out->direction[3] = 0.;
-
-    bgMat4_identity(out->model);
-    bgMat4_identity(out->view);
-    bgMat4_identity(out->projection);
+    if (camera->vertical > CAMERA_MAX_VERTICAL_DEGREES)
+        camera->vertical = CAMERA_MAX_VERTICAL_DEGREES;
+    else if (camera->vertical < -CAMERA_MAX_VERTICAL_DEGREES)
+        camera->vertical = -CAMERA_MAX_VERTICAL_DEGREES;
 }
 
-void bgCamera_offsetHeading(bgCamera *cam, float angle) {
-    if ((cam->pitch > bg_degToRad(90) && cam->pitch < bg_degToRad(270)) ||
-        (cam->pitch < bg_degToRad(-90) && cam->pitch > bg_degToRad(-270)))
-        cam->heading -= angle;
-    else
-        cam->heading += angle;
+void bg_camera(bgCamera *camera, float aspect) {
+    camera->fovDegrees = 90.f;
+    camera->aspect = aspect;
+    camera->near = .01;
+    camera->far = 1000.;
+
+    camera->horizontal = 0.;
+    camera->vertical = 0.;
+
+    camera->speed = .05;
+
+    bgVec3f_zero(camera->position);
 }
 
-void bgCamera_offsetPitch(bgCamera *cam, float angle) { cam->pitch += angle; }
+void bgCamera_lookAt(bgCamera *camera, bgVec3f v) {
+    bgVec3f dir;
+    bgVec3f_sub(dir, v, camera->position);
+    bgVec3f_normalize(dir, dir);
 
-void bgCamera_mouse(bgCamera *cam) {
+    camera->horizontal = -bg_degToRad(atan2f(-dir[0], -dir[2]));
+    camera->vertical = bg_degToRad(asinf(-dir[1]));
+    normalizeAngles_(camera);
+}
+
+void bgCamera_move(bgCamera *camera, enum bgCameraDirection direction) {
+    // TODO: Implement camera movement
+    /*
+    bgVec4f dv = {0, 0, 0, 0};
+    bgMat4 orient;
+
+    bgMat4_identity(orient);
+    bgCamera_orientation(camera, orient);
+    bgMat4_invert(orient, orient);
+
+    // Calculate dv
+
+    bgVec4f_scale(dv, dv, camera->speed);
+    bgVec3f_add(camera->position, camera->position, dv);
+    */
+}
+
+void bgCamera_mouse(bgCamera *camera) {
+    // NOTE: We probably dont have to use 
+    // `bgMouse_getRelativePosition` anymore 
+    // because this doesnt rely on delta positions
+
     bgVec2i mousePosition = {0, 0};
     bgMouse_getRelativePosition(mousePosition);
 
-    bgVec2i delta;
-    bgVec2i_sub(delta, cam->oldRelativeMousePosition, mousePosition);
-    memcpy(cam->oldRelativeMousePosition, mousePosition, sizeof(bgVec2i));
-
-    bgCamera_offsetHeading(cam, 0.01 * (float)delta[0]);
-    bgCamera_offsetPitch(cam, 0.01 * (float)delta[1]);
+    camera->horizontal += 0.05 * (float)mousePosition[0];
+    camera->vertical += 0.05 * (float)mousePosition[1];
+    normalizeAngles_(camera);
 }
 
-void bgCamera_move(bgCamera *cam, enum bgCameraMoveDirection dir) {
-    bgVec3f t = {0., 0., 0.};
+void bgCamera_view(bgCamera const *camera, bgMat4 out) {
+    bgVec3f invPos;
+    bgMat4 trans;
+    bgMat4 orient;
 
-    // TODO: Add camera speed
-    switch (dir) {
-    case BG_CAMERA_MOVE_UP:
-        bgVec3f_scale(t, cam->up, cam->speed);
-        bgVec3f_sub(cam->position, cam->position, t);
-        break;
-    case BG_CAMERA_MOVE_DOWN:
-        bgVec3f_scale(t, cam->up, cam->speed);
-        bgVec3f_add(cam->position, cam->position, t);
-        break;
-    case BG_CAMERA_MOVE_LEFT:
-        bgVec3f_cross(t, cam->direction, cam->up);
-        bgVec3f_normalize(t, t);
-        bgVec3f_scale(t, t, cam->speed);
-        bgVec3f_add(cam->position, cam->position, t);
-        break;
-    case BG_CAMERA_MOVE_RIGHT:
-        bgVec3f_cross(t, cam->direction, cam->up);
-        bgVec3f_normalize(t, t);
-        bgVec3f_scale(t, t, cam->speed);
-        bgVec3f_sub(cam->position, cam->position, t);
-        break;
-    case BG_CAMERA_MOVE_FORWARD:
-        bgVec3f_add(t, t, cam->direction);
-        bgVec3f_scale(t, t, cam->speed);
-        bgVec3f_add(cam->position, cam->position, t);
-        break;
-    case BG_CAMERA_MOVE_BACKWARD:
-        bgVec3f_add(t, t, cam->direction);
-        bgVec3f_scale(t, t, cam->speed);
-        bgVec3f_sub(cam->position, cam->position, t);
-        break;
-    }
+    bgVec3f_invert(invPos, camera->position);
+    bgMat4_identity(trans);
+    bgMat4_identity(orient);
+
+    bgCamera_orientation(camera, orient);
+    bgMat4_translate(trans, invPos);
+
+    bgMat4_mul(out, orient, trans);
 }
 
-void bgCamera_step(bgCamera *cam, float dt) {
-    bgVec3f_sub(cam->direction, cam->lookAt, cam->position);
-    bgVec3f_normalize(cam->direction, cam->direction);
+void bgCamera_projection(bgCamera const *camera, bgMat4 out) {
+    bgMat4_perspective(out, bg_degToRad(camera->fovDegrees), camera->aspect,
+                       camera->near, camera->far);
+}
 
-    // TODO: Set viewport?
-
-    bgMat4_perspective(cam->projection, cam->fov, cam->aspect, cam->near,
-                       cam->far);
-
-    bgVec3f axis = {0., 0., 0.};
-    bgVec3f_cross(axis, cam->direction, cam->up);
-
-    bgQuat pitch = {0., 0., 0., 0.};
-    bgQuat_angleAxis(pitch, cam->pitch, axis);
-
-    bgQuat heading = {0., 0., 0., 0.};
-    bgQuat_angleAxis(heading, cam->heading, cam->up);
-
-    bgQuat rot = {0., 0., 0., 0.};
-    bgQuat_cross(rot, pitch, heading);
-    bgQuat_normalize(rot, rot);
-
-    bgQuat_rotate(cam->direction, rot, cam->direction);
-
-    bgVec3f_add(cam->lookAt, cam->position, cam->direction);
-
-    bgMat4_lookAt(cam->view, cam->position, cam->lookAt, cam->up);
-
-    // bgMat4_identity(cam->model);
-    //  NOTE: This is temporary
-    bgMat4_translate(cam->model, (bgVec3f){0., 5., 5.});
-    bgMat4_scale(cam->model, cam->model, 1.);
+void bgCamera_orientation(bgCamera const *camera, bgMat4 out) {
+    bgMat4_rotateX(out, out, bg_degToRad(camera->vertical));
+    bgMat4_rotateY(out, out, bg_degToRad(camera->horizontal));
 }
