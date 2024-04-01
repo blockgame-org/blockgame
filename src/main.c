@@ -1,5 +1,7 @@
 #include <blockgame/engine.h>
 
+#include <blockgame/log.h>
+
 int main(int argc, char const **argv) {
     (void)argc;
     (void)argv;
