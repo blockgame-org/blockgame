@@ -76,3 +76,27 @@ void bgVector_cleanup(bgVector *vec, void (*cleanup)(void *)) {
 
     bgVector_free(vec);
 }
+
+void bgVector_duplicate(bgVector *out, bgVector *src) {
+    out->element = src->element;
+    out->length = src->length;
+    out->capacity = src->capacity;
+    free(out->raw);
+
+    out->raw = bg_calloc(out->capacity, out->element);
+
+    memcpy(out->raw, src->raw, out->element * out->capacity);
+}
+
+// copy = func (dest, src);
+void bgVector_copy(bgVector *out, bgVector *src, void (*copy)(void *, void *)) {
+    out->element = src->element;
+    out->length = src->length;
+    out->capacity = src->capacity;
+    free(out->raw);
+
+    out->raw = bg_calloc(out->capacity, out->element);
+
+    for (size_t i = 0; i < out->length; i++)
+        copy(out->raw, src->raw);
+}

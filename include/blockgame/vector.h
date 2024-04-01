@@ -30,4 +30,6 @@ void bgVector_free(bgVector *vec);
 
 void bgVector_cleanup(bgVector *vec, void (*cleanup)(void *));
 
+void bgVector_duplicate(bgVector *out, bgVector *src);
+
 #endif // BLOCKGAME_VECTOR_H
