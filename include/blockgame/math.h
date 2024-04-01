@@ -8,6 +8,7 @@
 #include <blockgame/mathtypes.h>
 
 #include <math.h>
+#include <stddef.h>
 #include <stdint.h>
 
 #define BG_PI 3.14159265358979323846264338327950288
@@ -17,9 +18,20 @@
 #define bgVec3f_magnitude(v)                                                   \
     (sqrt((v)[0] * (v)[0] + (v)[1] * (v)[1] + (v)[2] * (v)[2]))
 
+static inline void bgVec2i_zero(bgVec2i out) {
+    out[0] = 0;
+    out[1] = 0;
+}
+
 static inline void bgVec2i_sub(bgVec2i out, bgVec2i v1, bgVec2i v2) {
     out[0] = v1[0] - v2[0];
     out[1] = v1[1] - v2[1];
+}
+
+static inline void bgVec3f_zero(bgVec3f out) {
+    out[0] = 0.;
+    out[1] = 0.;
+    out[2] = 0.;
 }
 
 static inline void bgVec3f_sub(bgVec3f out, bgVec3f v1, bgVec3f v2) {
@@ -34,7 +46,7 @@ static inline void bgVec3f_add(bgVec3f out, bgVec3f v1, bgVec3f v2) {
     out[2] = v1[2] + v2[2];
 }
 
-static inline void bgVec3f_invert(bgVec3f out, bgVec3f v) {
+static inline void bgVec3f_invert(bgVec3f out, bgVec3f const v) {
     out[0] = -v[0];
     out[1] = -v[1];
     out[2] = -v[2];
@@ -77,6 +89,13 @@ static inline void bgVec4f_scale(bgVec4f out, bgVec4f v, float s) {
     out[1] = v[1] * s;
     out[2] = v[2] * s;
     out[3] = v[3] * s;
+}
+
+static inline void bgVec4f_copy(bgVec4f out, bgVec4f v) {
+    out[0] = v[0];
+    out[1] = v[1];
+    out[2] = v[2];
+    out[3] = v[3];
 }
 
 static inline void bgMat4_zero(bgMat4 out) {
@@ -237,6 +256,166 @@ static inline void bgMat4_lookAt(bgMat4 out, bgVec3f eye, bgVec3f center,
     bgVec3f_invert(eyeInv, eye);
 
     bgMat4_translateInPlace(out, eyeInv);
+}
+
+static inline void bgMat4_mul_vec4(bgVec4f out, bgMat4 m, bgVec4f v) {
+    for (size_t i = 0; i < 4; ++i) {
+        out[i] = 0.;
+        for (size_t j = 0; j < 4; ++j)
+            out[i] += m[j][i] * v[j];
+    }
+}
+
+static inline void bgMat4_invert(bgMat4 out, bgMat4 m) {
+    /*
+        float s[6];
+        float c[6];
+        s[0] = M[0][0]*M[1][1] - M[1][0]*M[0][1];
+        s[1] = M[0][0]*M[1][2] - M[1][0]*M[0][2];
+        s[2] = M[0][0]*M[1][3] - M[1][0]*M[0][3];
+        s[3] = M[0][1]*M[1][2] - M[1][1]*M[0][2];
+        s[4] = M[0][1]*M[1][3] - M[1][1]*M[0][3];
+        s[5] = M[0][2]*M[1][3] - M[1][2]*M[0][3];
+
+        c[0] = M[2][0]*M[3][1] - M[3][0]*M[2][1];
+        c[1] = M[2][0]*M[3][2] - M[3][0]*M[2][2];
+        c[2] = M[2][0]*M[3][3] - M[3][0]*M[2][3];
+        c[3] = M[2][1]*M[3][2] - M[3][1]*M[2][2];
+        c[4] = M[2][1]*M[3][3] - M[3][1]*M[2][3];
+        c[5] = M[2][2]*M[3][3] - M[3][2]*M[2][3];
+
+        float idet = 1.0f/(
+       s[0]*c[5]-s[1]*c[4]+s[2]*c[3]+s[3]*c[2]-s[4]*c[1]+s[5]*c[0] );
+
+        T[0][0] = ( M[1][1] * c[5] - M[1][2] * c[4] + M[1][3] * c[3]) * idet;
+        T[0][1] = (-M[0][1] * c[5] + M[0][2] * c[4] - M[0][3] * c[3]) * idet;
+        T[0][2] = ( M[3][1] * s[5] - M[3][2] * s[4] + M[3][3] * s[3]) * idet;
+        T[0][3] = (-M[2][1] * s[5] + M[2][2] * s[4] - M[2][3] * s[3]) * idet;
+
+        T[1][0] = (-M[1][0] * c[5] + M[1][2] * c[2] - M[1][3] * c[1]) * idet;
+        T[1][1] = ( M[0][0] * c[5] - M[0][2] * c[2] + M[0][3] * c[1]) * idet;
+        T[1][2] = (-M[3][0] * s[5] + M[3][2] * s[2] - M[3][3] * s[1]) * idet;
+        T[1][3] = ( M[2][0] * s[5] - M[2][2] * s[2] + M[2][3] * s[1]) * idet;
+
+        T[2][0] = ( M[1][0] * c[4] - M[1][1] * c[2] + M[1][3] * c[0]) * idet;
+        T[2][1] = (-M[0][0] * c[4] + M[0][1] * c[2] - M[0][3] * c[0]) * idet;
+        T[2][2] = ( M[3][0] * s[4] - M[3][1] * s[2] + M[3][3] * s[0]) * idet;
+        T[2][3] = (-M[2][0] * s[4] + M[2][1] * s[2] - M[2][3] * s[0]) * idet;
+
+        T[3][0] = (-M[1][0] * c[3] + M[1][1] * c[1] - M[1][2] * c[0]) * idet;
+        T[3][1] = ( M[0][0] * c[3] - M[0][1] * c[1] + M[0][2] * c[0]) * idet;
+        T[3][2] = (-M[3][0] * s[3] + M[3][1] * s[1] - M[3][2] * s[0]) * idet;
+        T[3][3] = ( M[2][0] * s[3] - M[2][1] * s[1] + M[2][2] * s[0]) * idet;
+    */
+    float s[6];
+    float c[6];
+
+    s[0] = m[0][0] * m[1][1] - m[1][0] * m[0][1];
+    s[1] = m[0][0] * m[1][2] - m[1][0] * m[0][2];
+    s[2] = m[0][0] * m[1][3] - m[1][0] * m[0][3];
+    s[3] = m[0][1] * m[1][2] - m[1][1] * m[0][2];
+    s[4] = m[0][1] * m[1][3] - m[1][1] * m[0][3];
+    s[5] = m[0][2] * m[1][3] - m[1][2] * m[0][3];
+
+    c[0] = m[2][0] * m[3][1] - m[3][0] * m[2][1];
+    c[1] = m[2][0] * m[3][2] - m[3][0] * m[2][2];
+    c[2] = m[2][0] * m[3][3] - m[3][0] * m[2][3];
+    c[3] = m[2][1] * m[3][2] - m[3][1] * m[2][2];
+    c[4] = m[2][1] * m[3][3] - m[3][1] * m[2][3];
+    c[5] = m[2][2] * m[3][3] - m[3][2] * m[2][3];
+
+    float i = 1. / (s[0] * c[5] - s[1] * c[4] + s[2] * c[3] + s[3] * c[2] -
+                    s[4] * c[1] + s[5] * c[0]);
+
+    out[0][0] = (m[1][1] * c[5] - m[1][2] * c[4] + m[1][3] * c[3]) * i;
+    out[0][1] = (-m[0][1] * c[5] + m[0][2] * c[4] - m[0][3] * c[3]) * i;
+    out[0][2] = (m[3][1] * s[5] - m[3][2] * s[4] + m[3][3] * s[3]) * i;
+    out[0][3] = (-m[2][1] * s[5] + m[2][2] * s[4] - m[2][3] * s[3]) * i;
+
+    out[1][0] = (-m[1][0] * c[5] + m[1][2] * c[2] - m[1][3] * c[1]) * i;
+    out[1][1] = (m[0][0] * c[5] - m[0][2] * c[2] + m[0][3] * c[1]) * i;
+    out[1][2] = (-m[3][0] * s[5] + m[3][2] * s[2] - m[3][3] * s[1]) * i;
+    out[1][3] = (m[2][0] * s[5] - m[2][2] * s[2] + m[2][3] * s[1]) * i;
+
+    out[2][0] = (m[1][0] * c[4] - m[1][1] * c[2] + m[1][3] * c[0]) * i;
+    out[2][1] = (-m[0][0] * c[4] + m[0][1] * c[2] - m[0][3] * c[0]) * i;
+    out[2][2] = (m[3][0] * s[4] - m[3][1] * s[2] + m[3][3] * s[0]) * i;
+    out[2][3] = (-m[2][0] * s[4] + m[2][1] * s[2] - m[2][3] * s[0]) * i;
+
+    out[3][0] = (-m[1][0] * c[3] + m[1][1] * c[1] - m[1][2] * c[0]) * i;
+    out[3][1] = (m[0][0] * c[3] - m[0][1] * c[1] + m[0][2] * c[0]) * i;
+    out[3][2] = (-m[3][0] * s[3] + m[3][1] * s[1] - m[3][2] * s[0]) * i;
+    out[3][3] = (m[2][0] * s[3] - m[2][1] * s[1] + m[2][2] * s[0]) * i;
+}
+
+static inline void bgMat4_copy(bgMat4 out, bgMat4 m) {
+    bgVec4f_copy(out[0], m[0]);
+    bgVec4f_copy(out[1], m[1]);
+    bgVec4f_copy(out[2], m[2]);
+    bgVec4f_copy(out[3], m[3]);
+}
+
+static inline void bgMat4_mul(bgMat4 out, bgMat4 m1, bgMat4 m2) {
+    bgMat4 t;
+
+    for (size_t i = 0; i < 4; ++i)
+        for (size_t j = 0; j < 4; ++j) {
+            t[i][j] = 0.;
+            for (size_t k = 0; k < 4; ++k)
+                t[i][j] += m1[k][j] * m2[i][k];
+        }
+
+    bgMat4_copy(out, t);
+}
+
+static inline void bgMat4_rotateX(bgMat4 out, bgMat4 m, float angle) {
+    float s = sinf(angle);
+    float c = cosf(angle);
+
+    bgMat4 r;
+    r[0][0] = 1.;
+    r[0][1] = 0.;
+    r[0][2] = 0.;
+    r[0][3] = 0.;
+    r[1][0] = 0.;
+    r[1][1] = c;
+    r[1][2] = s;
+    r[1][3] = 0.;
+    r[2][0] = 0.;
+    r[2][1] = -s;
+    r[2][2] = c;
+    r[2][3] = 0.;
+    r[3][0] = 0.;
+    r[3][1] = 0.;
+    r[3][2] = 0.;
+    r[3][3] = 1.;
+
+    bgMat4_mul(out, m, r);
+}
+
+static inline void bgMat4_rotateY(bgMat4 out, bgMat4 m, float angle) {
+    float s = sinf(angle);
+    float c = cosf(angle);
+
+    bgMat4 r;
+    r[0][0] = c;
+    r[0][1] = 0.;
+    r[0][2] = -s;
+    r[0][3] = 0.;
+    r[1][0] = 0.;
+    r[1][1] = 1.;
+    r[1][2] = 0.;
+    r[1][3] = 0.;
+    r[2][0] = s;
+    r[2][1] = 0.;
+    r[2][2] = c;
+    r[2][3] = 0.;
+    r[3][0] = 0.;
+    r[3][1] = 0.;
+    r[3][2] = 0.;
+    r[3][3] = 1.;
+
+    bgMat4_mul(out, m, r);
 }
 
 static inline void bgQuat_angleAxis(bgQuat out, float angle, bgVec3f n) {
