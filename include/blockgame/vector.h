@@ -32,4 +32,7 @@ void bgVector_cleanup(bgVector *vec, void (*cleanup)(void *));
 
 void bgVector_duplicate(bgVector *out, bgVector *src);
 
+// copy = func (dest, src);
+void bgVector_copy(bgVector *out, bgVector *src, void (*copy)(void *, void *));
+
 #endif // BLOCKGAME_VECTOR_H
