@@ -280,4 +280,5 @@ void bgModel_load(bgModel *out, char *file_name) {
     char *file_data = NULL;
     bg_readFile(&file_data, file_name);
     bgModel_parse(out, file_data);
+    free(file_data);
 }

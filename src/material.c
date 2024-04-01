@@ -1,3 +1,4 @@
+#include "parsing.h"
 #include "str.h"
 #include <blockgame/file.h>
 #include <blockgame/log.h>
@@ -129,39 +130,8 @@ void parse_newmtl_(bgModelMaterial *out, char *line, size_t len) {
     bg_modelMaterial(out, line, len - (line - initial_line));
 }
 
-void parse_filename_(char **str_out, size_t *len_out, char *line, size_t len) {
-    char *initial_line = line;
-    line = skip_op_(line, len);
-
-    if (len - (line - initial_line) == 0)
-        bg_panic("Filename cannot be empty:\n  %.*s", (int)len, initial_line);
-
-    *len_out = len - (line - initial_line);
-    *str_out = line;
-}
-
 void parse_color_(bgColorf *out, char *line, size_t len) {
-    char *initial_line = line;
-    line = skip_op_(line, len);
-
-    for (int i = 0; i < 3; i++) {
-        if (!line[0] || line[0] == '\n')
-            bg_panic("color element does not contain enough values:\n  %.*s",
-                     (int)len, initial_line);
-        out->values[i] =
-            strtof(line, NULL); // TODO: check if it stops on an invalid char
-        line = str_after(' ', line);
-    }
-}
-
-void parse_float_(float *out, char *line, size_t len) {
-    line = skip_op_(line, len);
-    *out = strtof(line, NULL);
-}
-
-void parse_int_(int *out, char *line, size_t len) {
-    line = skip_op_(line, len);
-    *out = strtod(line, NULL);
+    parsing_parseFloatArray((float *)out, 3, line, len);
 }
 
 void parse_material_line_(bgMtllib *out, char *line, size_t len) {
@@ -194,19 +164,19 @@ void parse_material_line_(bgMtllib *out, char *line, size_t len) {
         mat->specular_color = color;
     } else if (str_startsWith(line, "Ns")) {
         float weight;
-        parse_float_(&weight, line, len);
+        parsing_parseFloat(&weight, line, len);
         bgModelMaterial *mat = bgVector_at(bgModelMaterial, &out->materials,
                                            out->materials.length - 1);
         mat->specular_weight = weight;
     } else if (str_startsWith(line, "d")) {
         float d;
-        parse_float_(&d, line, len);
+        parsing_parseFloat(&d, line, len);
         bgModelMaterial *mat = bgVector_at(bgModelMaterial, &out->materials,
                                            out->materials.length - 1);
         mat->dissolve = d;
     } else if (str_startsWith(line, "Tr")) {
         float d;
-        parse_float_(&d, line, len);
+        parsing_parseFloat(&d, line, len);
         bgModelMaterial *mat = bgVector_at(bgModelMaterial, &out->materials,
                                            out->materials.length - 1);
         mat->dissolve = 1.0f - d;
@@ -218,48 +188,48 @@ void parse_material_line_(bgMtllib *out, char *line, size_t len) {
         mat->filter_color = color;
     } else if (str_startsWith(line, "Ni")) {
         float d;
-        parse_float_(&d, line, len);
+        parsing_parseFloat(&d, line, len);
         bgModelMaterial *mat = bgVector_at(bgModelMaterial, &out->materials,
                                            out->materials.length - 1);
         mat->refraction_index = d;
     } else if (str_startsWith(line, "illum")) {
         int d;
-        parse_int_(&d, line, len);
+        parsing_parseInt(&d, line, len);
         bgModelMaterial *mat = bgVector_at(bgModelMaterial, &out->materials,
                                            out->materials.length - 1);
         mat->illumination_model = d;
     } else if (str_startsWith(line, "map_Ka")) {
         char *filename;
         size_t name_len;
-        parse_filename_(&filename, &name_len, line, len);
+        parsing_parseName(&filename, &name_len, line, len);
         bgModelMaterial *mat = bgVector_at(bgModelMaterial, &out->materials,
                                            out->materials.length - 1);
         bgModelMaterial_setAmbientTexture(mat, filename, name_len);
     } else if (str_startsWith(line, "map_Ks")) {
         char *filename;
         size_t name_len;
-        parse_filename_(&filename, &name_len, line, len);
+        parsing_parseName(&filename, &name_len, line, len);
         bgModelMaterial *mat = bgVector_at(bgModelMaterial, &out->materials,
                                            out->materials.length - 1);
         bgModelMaterial_setSpecularTexture(mat, filename, name_len);
     } else if (str_startsWith(line, "map_Kd")) {
         char *filename;
         size_t name_len;
-        parse_filename_(&filename, &name_len, line, len);
+        parsing_parseName(&filename, &name_len, line, len);
         bgModelMaterial *mat = bgVector_at(bgModelMaterial, &out->materials,
                                            out->materials.length - 1);
         bgModelMaterial_setDiffuseTexture(mat, filename, name_len);
     } else if (str_startsWith(line, "map_Ns")) {
         char *filename;
         size_t name_len;
-        parse_filename_(&filename, &name_len, line, len);
+        parsing_parseName(&filename, &name_len, line, len);
         bgModelMaterial *mat = bgVector_at(bgModelMaterial, &out->materials,
                                            out->materials.length - 1);
         bgModelMaterial_setHighlightTexture(mat, filename, name_len);
     } else if (str_startsWith(line, "map_d")) {
         char *filename;
         size_t name_len;
-        parse_filename_(&filename, &name_len, line, len);
+        parsing_parseName(&filename, &name_len, line, len);
         bgModelMaterial *mat = bgVector_at(bgModelMaterial, &out->materials,
                                            out->materials.length - 1);
         bgModelMaterial_setAlphaTexture(mat, filename, name_len);
@@ -267,21 +237,21 @@ void parse_material_line_(bgMtllib *out, char *line, size_t len) {
                str_startsWith(line, "bump")) {
         char *filename;
         size_t name_len;
-        parse_filename_(&filename, &name_len, line, len);
+        parsing_parseName(&filename, &name_len, line, len);
         bgModelMaterial *mat = bgVector_at(bgModelMaterial, &out->materials,
                                            out->materials.length - 1);
         bgModelMaterial_setBumpTexture(mat, filename, name_len);
     } else if (str_startsWith(line, "disp")) {
         char *filename;
         size_t name_len;
-        parse_filename_(&filename, &name_len, line, len);
+        parsing_parseName(&filename, &name_len, line, len);
         bgModelMaterial *mat = bgVector_at(bgModelMaterial, &out->materials,
                                            out->materials.length - 1);
         bgModelMaterial_setDisplacementTexture(mat, filename, name_len);
     } else if (str_startsWith(line, "decal")) {
         char *filename;
         size_t name_len;
-        parse_filename_(&filename, &name_len, line, len);
+        parsing_parseName(&filename, &name_len, line, len);
         bgModelMaterial *mat = bgVector_at(bgModelMaterial, &out->materials,
                                            out->materials.length - 1);
         bgModelMaterial_setDecalTexture(mat, filename, name_len);
@@ -308,4 +278,5 @@ void bgMtllib_load(bgMtllib *out, char *file_name) {
     char *file_data = NULL;
     bg_readFile(&file_data, file_name);
     bgMtllib_parse(out, file_data, file_name, strlen(file_name));
+    free(file_data);
 }
