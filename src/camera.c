@@ -2,6 +2,7 @@
 
 #include <blockgame/log.h>
 #include <blockgame/math.h>
+#include <blockgame/mouse.h>
 
 #include <string.h>
 
@@ -9,7 +10,7 @@ void bg_camera(bgCamera *out) {
     memset(out, 0, sizeof(bgCamera));
 
     out->aspect = 0.;
-    out->fov = bg_degToRad(45);
+    out->fov = bg_degToRad(90);
     out->near = .1;
     out->far = 1000.;
 
@@ -37,6 +38,28 @@ void bg_camera(bgCamera *out) {
     bgMat4_identity(out->model);
     bgMat4_identity(out->view);
     bgMat4_identity(out->projection);
+}
+
+void bgCamera_offsetHeading(bgCamera *cam, float angle) {
+    if ((cam->pitch > bg_degToRad(90) && cam->pitch < bg_degToRad(270)) ||
+        (cam->pitch < bg_degToRad(-90) && cam->pitch > bg_degToRad(-270)))
+        cam->heading -= angle;
+    else
+        cam->heading += angle;
+}
+
+void bgCamera_offsetPitch(bgCamera *cam, float angle) { cam->pitch += angle; }
+
+void bgCamera_mouse(bgCamera *cam) {
+    bgVec2i mousePosition = {0, 0};
+    bgMouse_getRelativePosition(mousePosition);
+
+    bgVec2i delta;
+    bgVec2i_sub(delta, cam->oldRelativeMousePosition, mousePosition);
+    memcpy(cam->oldRelativeMousePosition, mousePosition, sizeof(bgVec2i));
+
+    bgCamera_offsetHeading(cam, 0.01 * (float)delta[0]);
+    bgCamera_offsetPitch(cam, 0.01 * (float)delta[1]);
 }
 
 void bgCamera_move(bgCamera *cam, enum bgCameraMoveDirection dir) {

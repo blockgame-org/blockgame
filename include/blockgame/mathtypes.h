@@ -1,6 +1,9 @@
 #ifndef BLOCKGAME_MATHTYPES_H
 #define BLOCKGAME_MATHTYPES_H
 
+typedef int bgVec2i[2];
+
+typedef unsigned int bgVec2u[2];
 typedef unsigned int bgVec4u[4];
 
 typedef float bgVec2f[2];

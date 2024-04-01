@@ -9,11 +9,11 @@ typedef struct {
     unsigned int id;
 } bgShader;
 
-int bg_vertex_shader(bgShader *out, char const *fileName, char const *content,
-                     size_t contentLength);
+int bg_vertexShader(bgShader *out, char const *fileName, char const *content,
+                    size_t contentLength);
 
-int bg_fragment_shader(bgShader *out, char const *fileName, char const *content,
-                       size_t contentLength);
+int bg_fragmentShader(bgShader *out, char const *fileName, char const *content,
+                      size_t contentLength);
 
 int bgShader_free(bgShader *shader);
 

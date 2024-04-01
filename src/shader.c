@@ -41,8 +41,8 @@ unsigned int compileShader_(GLenum type, char const *fileName,
     return 0;
 }
 
-int bg_vertex_shader(bgShader *out, char const *fileName, char const *content,
-                     size_t contentLength) {
+int bg_vertexShader(bgShader *out, char const *fileName, char const *content,
+                    size_t contentLength) {
     unsigned int id =
         compileShader_(GL_VERTEX_SHADER, fileName, content, contentLength);
 
@@ -52,8 +52,8 @@ int bg_vertex_shader(bgShader *out, char const *fileName, char const *content,
     return 0;
 }
 
-int bg_fragment_shader(bgShader *out, char const *fileName, char const *content,
-                       size_t contentLength) {
+int bg_fragmentShader(bgShader *out, char const *fileName, char const *content,
+                      size_t contentLength) {
     unsigned int id =
         compileShader_(GL_FRAGMENT_SHADER, fileName, content, contentLength);
 

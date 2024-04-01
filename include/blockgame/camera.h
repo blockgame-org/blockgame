@@ -22,8 +22,9 @@ typedef struct {
 
     float pitch;
     float heading;
-
     float speed;
+
+    bgVec2i oldRelativeMousePosition;
 
     bgVec3f up;
 
@@ -37,6 +38,11 @@ typedef struct {
 } bgCamera;
 
 void bg_camera(bgCamera *out);
+
+void bgCamera_offsetHeading(bgCamera *cam, float angle);
+void bgCamera_offsetPitch(bgCamera *cam, float angle);
+
+void bgCamera_mouse(bgCamera *cam);
 
 void bgCamera_move(bgCamera *cam, enum bgCameraMoveDirection dir);
 

@@ -17,6 +17,11 @@
 #define bgVec3f_magnitude(v)                                                   \
     (sqrt((v)[0] * (v)[0] + (v)[1] * (v)[1] + (v)[2] * (v)[2]))
 
+static inline void bgVec2i_sub(bgVec2i out, bgVec2i v1, bgVec2i v2) {
+    out[0] = v1[0] - v2[0];
+    out[1] = v1[1] - v2[1];
+}
+
 static inline void bgVec3f_sub(bgVec3f out, bgVec3f v1, bgVec3f v2) {
     out[0] = v1[0] - v2[0];
     out[1] = v1[1] - v2[1];
@@ -194,21 +199,21 @@ static inline void bgMat4_lookAt(bgMat4 out, bgVec3f eye, bgVec3f center,
 
     bgVec3f_cross(u, s, f);
 
-    /*
-      bgMat4_identity(out);
+    bgMat4_identity(out);
 
-      out[0][0] = s[0];
-      out[1][0] = s[1];
-      out[2][0] = s[2];
-      out[0][1] = u[0];
-      out[1][1] = u[1];
-      out[2][1] = u[2];
-      out[0][2] = -f[0];
-      out[1][2] = -f[1];
-      out[2][2] = -f[2];
-      out[0][3] = -bgVec3f_dot(s, eye);
-      out[1][3] = -bgVec3f_dot(u, eye);
-      out[2][3] = bgVec3f_dot(f, eye);
+    /*
+    out[0][0] = s[0];
+    out[1][0] = s[1];
+    out[2][0] = s[2];
+    out[0][1] = u[0];
+    out[1][1] = u[1];
+    out[2][1] = u[2];
+    out[0][2] = -f[0];
+    out[1][2] = -f[1];
+    out[2][2] = -f[2];
+    out[0][3] = -bgVec3f_dot(s, eye);
+    out[1][3] = -bgVec3f_dot(u, eye);
+    out[2][3] = bgVec3f_dot(f, eye);
     */
 
     out[0][0] = s[0];
