@@ -1,6 +1,7 @@
 #ifndef BLOCKGAME_FILE_H
 #define BLOCKGAME_FILE_H
 
+// TODO: Make bg_readFile return the length of the file
 /// @brief Reads and allocates the contents of a file into a string.
 /// @param out Output for the newly allocated string with the file's contents.
 /// @param filename Name of the file to be opened.

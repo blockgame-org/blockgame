@@ -1,3 +1,5 @@
+// TODO: Only log when an environment variable is set
+
 #ifndef BLOCKGAME_LOG_H
 #define BLOCKGAME_LOG_H
 

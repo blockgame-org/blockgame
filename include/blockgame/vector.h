@@ -10,6 +10,7 @@ typedef struct {
     size_t capacity;
 } bgVector;
 
+// TODO: Add an assert for idx
 #define bgVector_at(type, vec, idx) (&((type *)(vec)->raw)[idx])
 
 void bg_vector(bgVector *out, size_t element_size);
