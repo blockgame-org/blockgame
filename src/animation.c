@@ -3,9 +3,9 @@
 #include "str.h"
 #include <blockgame/animation.h>
 #include <blockgame/file.h>
+#include <blockgame/log.h>
 #include <blockgame/panic.h>
 #include <blockgame/utility.h>
-#include <blockgame/log.h>
 #include <string.h>
 
 void bgAnimation_bezier(bgAnimationBezier *out, float lv, float lt, float rv,
@@ -173,9 +173,7 @@ void bgAnimationObject_free(bgAnimationObject *obj) {
     free(obj->name);
 }
 
-void bgAnimationObject_cleanup(void *obj) {
-    bgAnimationObject_free(obj);
-}
+void bgAnimationObject_cleanup(void *obj) { bgAnimationObject_free(obj); }
 
 void bgAnimationKeyframe_getBezier(bgAnimationBezier *out,
                                    bgAnimationObject const *obj,
