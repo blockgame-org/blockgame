@@ -59,8 +59,8 @@ void bgCamera_move(bgCamera *camera, enum bgCameraDirection direction) {
 }
 
 void bgCamera_mouse(bgCamera *camera) {
-    // NOTE: We probably dont have to use 
-    // `bgMouse_getRelativePosition` anymore 
+    // NOTE: We probably dont have to use
+    // `bgMouse_getRelativePosition` anymore
     // because this doesnt rely on delta positions
 
     bgVec2i mousePosition = {0, 0};
