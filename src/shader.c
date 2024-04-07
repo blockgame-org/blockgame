@@ -94,6 +94,12 @@ int bgProgram_getUniformId(bgProgram *prog, char const *uniform_name) {
     return glGetUniformLocation(prog->id, uniform_name);
 }
 
+int bgProgram_setUniform1i(bgProgram *prog, int location, int i) {
+    // TODO: These dont actually bind the program
+    glUniform1i(location, i);
+    return 0;
+}
+
 int bgProgram_setUniformMat4(bgProgram *prog, int location, bgMat4 mat) {
     glUniformMatrix4fv(location, 1, GL_FALSE, (float *)mat);
     return 0;

@@ -33,6 +33,7 @@ int bgProgram_use(bgProgram *prog);
 
 int bgProgram_getUniformId(bgProgram *prog, char const *uniformName);
 
+int bgProgram_setUniform1i(bgProgram *prog, int location, int i);
 int bgProgram_setUniformMat4(bgProgram *prog, int location, bgMat4 m);
 
 void bgProgram_free(bgProgram *prog);
