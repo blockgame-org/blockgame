@@ -450,4 +450,27 @@ static inline void bgQuat_rotate(bgVec3f out, bgQuat q, bgVec3f v) {
     out[2] = v[2] + q[3] * t1[2] + t2[2];
 }
 
+// t is between 0 and 1
+static inline float catmull_rom_interp(float t, float v0, float v1, float v2, float v3) {
+    float c1 = 1. * v1;
+    float c2 = -.5 * v0 + 0.5 * v2;
+    float c3 = 1.0 * v0 + -2.5 * v1 + 2.0 * v2 - .5 * v3;
+    float c4 = -.5 * v0 + 1.5 * v1 + -1.5 * v2 + .5 * v3;
+    return (((c4 * t + c3) * t + c2) * t + c1);
+}
+
+// t is between 0 and 1
+static inline float lerp(float t, float v0, float v1) { return v0 + (v1 - v0) * t; }
+
+// * https://blog.maximeheckel.com/posts/cubic-bezier-from-math-to-motion/
+// p0 is the left control point
+// p3 is the right control point
+// t is between 0 and 1
+static inline float bezier_interp(float t, float v0, float v1, float v2, float v3) {
+    return pow(1. - t, 3) * v0 +
+           3 * pow(1. - t, 2) * t * v1 +
+           3 * (1. - t) * pow(t, 2) * v2 +
+           pow(t, 3) * v3;
+}
+
 #endif // BLOCKGAME_MATH_H
