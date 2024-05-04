@@ -1,6 +1,6 @@
 #include <blockgame/animator.h>
 #include <blockgame/panic.h>
-#include <string.h>;
+#include <string.h>
 #include <blockgame/math.h>
 
 void bgAnimator_timeline(bgAnimatorTimeline *out, bgAnimation *anim,
@@ -31,9 +31,9 @@ void bgAnimator_timeline(bgAnimatorTimeline *out, bgAnimation *anim,
                 int indice =
                     bgAnimationKeyframe_getBezierIndice(&keyframe, BG_ANIM_RX);
                 memcpy(animator_keyframe.interp_mode,
-                       keyframe.interp_mode[indice], sizeof(bgVec3f));
+                       &keyframe.interp_mode[indice], sizeof(bgVec3f));
                 memcpy(animator_keyframe.bezier_indices,
-                       keyframe.interp_bezier_ind[indice], sizeof(bgVec3f));
+                       &keyframe.interp_bezier_ind[indice], sizeof(bgVec3f));
             }
             break;
         case BG_ANIM_T:
@@ -43,9 +43,9 @@ void bgAnimator_timeline(bgAnimatorTimeline *out, bgAnimation *anim,
                 int indice =
                     bgAnimationKeyframe_getBezierIndice(&keyframe, BG_ANIM_TX);
                 memcpy(animator_keyframe.interp_mode,
-                       keyframe.interp_mode[indice], sizeof(bgVec3f));
+                       &keyframe.interp_mode[indice], sizeof(bgVec3f));
                 memcpy(animator_keyframe.bezier_indices,
-                       keyframe.interp_bezier_ind[indice], sizeof(bgVec3f));
+                       &keyframe.interp_bezier_ind[indice], sizeof(bgVec3f));
             }
             break;
         case BG_ANIM_S:
@@ -55,9 +55,9 @@ void bgAnimator_timeline(bgAnimatorTimeline *out, bgAnimation *anim,
                 int indice =
                     bgAnimationKeyframe_getBezierIndice(&keyframe, BG_ANIM_SX);
                 memcpy(animator_keyframe.interp_mode,
-                       keyframe.interp_mode[indice], sizeof(bgVec3f));
+                       &keyframe.interp_mode[indice], sizeof(bgVec3f));
                 memcpy(animator_keyframe.bezier_indices,
-                       keyframe.interp_bezier_ind[indice], sizeof(bgVec3f));
+                       &keyframe.interp_bezier_ind[indice], sizeof(bgVec3f));
             }
             break;
         default:
@@ -93,7 +93,7 @@ void bgAnimator_step(bgAnimator *animator, float step) {
 }
 
 // get a transformation matrix at the current time step
-void bgAnimator_getTransformationMatrix(bgMat4 *out, bgAnimator *animator,
+void bgAnimator_getTransformationMatrix(bgMat4 out, bgAnimator *animator,
                                         bgObject *obj) {
     bgAnimatorTimeline *trans_timeline; // :O trans-timeline! woah!
     bgAnimatorTimeline *rot_timeline;
@@ -125,14 +125,14 @@ void bgAnimator_getTransformationMatrix(bgMat4 *out, bgAnimator *animator,
     bgAnimator_getChannelValues(&rot, &trans, &scale,
                                 rot_timeline, trans_timeline, scale_timeline,
                                 animator);
-    rot[0] = rot[0] / 180 * BG_PI;
-    rot[1] = rot[1] / 180 * BG_PI;
-    rot[2] = rot[2] / 180 * BG_PI;
+    rot[0] = bg_degToRad(rot[0]);
+    rot[1] = bg_degToRad(rot[1]);
+    rot[2] = bg_degToRad(rot[2]);
     bgMat4_rotateX(out, out, rot[0]);
     bgMat4_rotateY(out, out, rot[1]);
     bgMat4_rotateZ(out, out, rot[2]);
     bgMat4_translate(out, trans);
-    bgMat4_scale(out, out, scale);
+    // bgMat4_scale(out, out, scale); // this does not worketh
 }
 
 float bgAnimator_interpolate(float t, float current_value, float next_value,
@@ -159,10 +159,10 @@ float bgAnimator_interpolate(float t, float current_value, float next_value,
                                                   : timeline->keyframes.length);
         return catmull_rom_interp(t, before_keyframe->transformation[val_index],
                                   current_value, next_value,
-                                  next_keyframe_plus->transformation[val_index])
+                                  next_keyframe_plus->transformation[val_index]);
     }
     if (current_imode == BG_ANIM_BEZIER || next_imode == BG_ANIM_BEZIER) {
-        return bezier_interp(current_value,
+        return bezier_interp(t, current_value,
                              current_value + current_bezier.right_value,
                              next_value + next_bezier.left_value, next_value);
     }
