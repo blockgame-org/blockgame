@@ -97,7 +97,7 @@ int bgEngine_run(void) {
 
     int tex = bgProgram_getUniformId(&prog, "tex");
     bgTexture2D texture;
-    bg_readTexture2D(&texture, "res/textures/dirt.png", GL_REPEAT, GL_NEAREST,
+    bg_readTexture2D(&texture, "res/textures/grass.png", GL_REPEAT, GL_NEAREST,
                      0);
     bgTexture2D_use(&texture);
     bgProgram_setUniform1i(&prog, tex, texture.id);
