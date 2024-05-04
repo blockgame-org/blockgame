@@ -473,4 +473,8 @@ static inline float bezier_interp(float t, float v0, float v1, float v2, float v
            pow(t, 3) * v3;
 }
 
+// check if two floats are equal to each other within `epsilon_val` level of error
+static inline int epsilon(float left, float right, float epsilon_val) {
+    return fabs(left - right) < epsilon_val;
+}
 #endif // BLOCKGAME_MATH_H
