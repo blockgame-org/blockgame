@@ -3,7 +3,7 @@
 
 CC=cc
 CFLAGS=-Wall -Iinclude
-LDFLAGS=-lSDL2 -lepoxy -lm
+LDFLAGS=-lSDL2 -lepoxy -lm -lSDL2_image -lSDL2_ttf
 BLOCKGAME=blockgame
 
 CLANG_FORMAT=clang-format
