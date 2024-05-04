@@ -6,9 +6,10 @@
 #include <blockgame/vector.h>
 
 enum bgAnimationInterpMode {
-    BG_ANIM_LINEAR = 0,
-    BG_ANIM_BEZIER = 1,
-    BG_ANIM_CATMULLROM = 2
+    BG_ANIM_NOCHANGE = 0, // a channel is unchanged
+    BG_ANIM_LINEAR = 1,
+    BG_ANIM_BEZIER = 2,
+    BG_ANIM_CATMULLROM = 3
 };
 
 // silly bitflags used here. Honestly pretty epic

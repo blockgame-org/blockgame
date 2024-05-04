@@ -51,7 +51,7 @@ void bgAnimation_keyframe(bgAnimationKeyframe *out, float timestamp) {
     memcpy(&out->scale, (bgVec3f){0.0f, 0.0f, 0.0f}, sizeof(out->scale));
     memcpy(&out->pivot, (bgVec3f){0.0f, 0.0f, 0.0f}, sizeof(out->pivot));
 
-    memset(&out->interp_mode, (int)BG_ANIM_LINEAR, sizeof(out->interp_mode));
+    memset(&out->interp_mode, (int)BG_ANIM_NOCHANGE, sizeof(out->interp_mode));
     memset(&out->interp_bezier_ind, -1, sizeof(out->interp_bezier_ind));
 }
 

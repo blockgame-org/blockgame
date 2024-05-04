@@ -59,3 +59,15 @@ ibez <channel> <num or var> <num or var> <num or var> <num or var>
 # interpolation mode for this keyframe (channel, linear | bezier | catmullrom)
 imode <channel> <0|1|2>
 ```
+
+# planned additions
+
+- animation variables (these have syntax but aren't actually working)
+- `aplay <audio source file to play> <start_seconds> <end_seconds>` play audio
+- `disppart <x> <y> <z> <particle_effect_indice>` show a particle efect. Particle effects are passed into the `bgAnimator` and the indice is used to display whichever particle effect is defined there.
+- `cmat <material_name>` change the material of the object. These materials are defined in the objects corrosponding `.mtl` file.
+
+
+## Interpolation precedence
+
+https://github.com/JannisX11/blockbench/blob/f7f7c002059c92b3516e71fb129d0be91352ff34/js/animations/timeline_animators.js#L371

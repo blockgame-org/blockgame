@@ -27,11 +27,11 @@ class AnimMotion:
         interp_mode = 0
         match self.interpolation:
             case "linear":
-                interp_mode = 0
-            case "bezier":
                 interp_mode = 1
-            case "catmullrom":
+            case "bezier":
                 interp_mode = 2
+            case "catmullrom":
+                interp_mode = 3
 
         return f'imode {channel}{component} {interp_mode}'
 
