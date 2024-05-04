@@ -46,8 +46,8 @@ void bgAnimator_free(bgAnimator *animator);
 void bgAnimator_step(bgAnimator *animator, float step);
 
 // get a transformation matrix at the current time step
-void bgAnimator_getTransformationMatrix(bgMat4 *out, bgAnimator *animator,
-                                        bgAnimatorTimeline *obj);
+void bgAnimator_getTransformationMatrix(bgMat4 out, bgAnimator *animator,
+                                        bgObject *obj);
 
 void bgAnimator_getChannelValue(bgVec3f *out, bgAnimatorTimeline *timeline,
                                 bgAnimator *animator);
@@ -59,10 +59,10 @@ void bgAnimator_getChannelValues(bgVec3f *rot_out, bgVec3f *trans_out,
                                  bgAnimatorTimeline *scale_timeline,
                                  bgAnimator *animator);
 
-void bgAnimator_getCurrentKeyframe(bgAnimatorKeyframe *out,
-                                   bgAnimatorTimeline *timeline, float time);
+int bgAnimator_getCurrentKeyframe(bgAnimatorKeyframe *out,
+                                  bgAnimatorTimeline *timeline, float time);
 
-void bgAnimator_getNextKeyframe(bgAnimatorKeyframe *out,
-                                bgAnimatorTimeline *timeline, float time);
+int bgAnimator_getNextKeyframe(bgAnimatorKeyframe *out,
+                               bgAnimatorTimeline *timeline, float time);
 
 #endif // BG_ANIMATOR_H
