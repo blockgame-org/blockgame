@@ -378,6 +378,31 @@ static inline void bgMat4_rotateY(bgMat4 out, bgMat4 m, float angle) {
     bgMat4_mul(out, m, r);
 }
 
+static inline void bgMat4_rotateZ(bgMat4 out, bgMat4 m, float angle) {
+    float s = sinf(angle);
+    float c = cosf(angle);
+
+    bgMat4 r;
+    r[0][0] = c;
+    r[0][1] = s;
+    r[0][2] = 0.;
+    r[0][3] = 0.;
+    r[1][0] = -s;
+    r[1][1] = c;
+    r[1][2] = 0.;
+    r[1][3] = 0.;
+    r[2][0] = 0.;
+    r[2][1] = 0.;
+    r[2][2] = 1.;
+    r[2][3] = 0.;
+    r[3][0] = 0.;
+    r[3][1] = 0.;
+    r[3][2] = 0.;
+    r[3][3] = 1.;
+
+    bgMat4_mul(out, m, r);
+}
+
 static inline void bgQuat_angleAxis(bgQuat out, float angle, bgVec3f n) {
     float s = sinf(angle * .5);
 
