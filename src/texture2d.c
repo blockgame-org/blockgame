@@ -41,7 +41,8 @@ int bg_readTexture2D(bgTexture2D *out, char const *filePath, GLint wrapMode,
 }
 
 int bgTexture2D_use(bgTexture2D *t) {
-  glBindTexture(GL_TEXTURE_2D, t->id);
+    glBindTexture(GL_TEXTURE_2D, t->id);
+    return 0;
 }
 
 int bgTexture2d_free(bgTexture2D *t) {
