@@ -9,7 +9,7 @@ with open("makefile-template") as f:
 
 
 def main():
-    gcc_mm_output = os.popen("gcc -MM -Iinclude src/*.c").read()
+    gcc_mm_output = os.popen("gcc -MM -IBlockGame BlockGame/*.c BlockGame/Input/*.c BlockGame/Graphics/*.c BlockGame/Basic/*.c").read()
     # print(MAKE_TEMPLATE.format(GCC_MM_OUTPUT=gcc_mm_output))
 
     with open("makefile", 'w') as f:
